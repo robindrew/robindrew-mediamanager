@@ -1,0 +1,148 @@
+<html>
+
+
+<head>
+<title>${title}</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+
+<style>
+body { padding-top: 10px; }
+form { display: inline; }
+a:link, a:visited a:link:active, a:visited:active { 
+    text-decoration: none;
+}
+</style>
+
+
+</head>
+
+
+<body>
+
+<!-- START CONTAINER -->
+<div class="container">
+
+
+<!-- NAV BAR -->
+<nav class="navbar navbar-default">
+<div class="container-fluid">
+<div class="navbar-header">
+<a class="navbar-brand" href="/">${serviceName} #${serviceInstance}</a>
+</div>
+<ul class="nav navbar-nav">
+<li><a href="/Photos">Photos</a></li>
+<li><a href="/Photos/Collection?name=${collection.urlEncodedName}">Collection</a></li>
+<li class="active"><a href="/Photos/Collection?name=${collection.urlEncodedName}&number=${currentPage}">Page ${currentPage}</a></li>
+</ul>
+</div><!-- /.container-fluid -->
+</nav>
+<!-- NAV BAR -->
+
+
+<!-- START ROW -->
+<div class="row">
+
+<!-- TITLE -->
+<div class="col-md-12">
+<h3><span class="glyphicon glyphicon-picture" aria-hidden="true"></span> Photo Collection <small> - ${collection.name}</small></h3>
+<hr/>
+</div>
+
+<div class="col-md-12">
+<ul class="pager">
+  <li class="previous #if($previousPage == 0) disabled #end"><a href="#if($previousPage == 0)# #else /Photos/Collection?name=${collection.urlEncodedName}&number=${previousPage} #end">Previous</a></li>
+  <li><form><input type="hidden" name="name" value="${collection.name}"/><input type="text" size="2" name="number" value="${currentPage}"/></form> / ${pageCount}</li>
+  <li class="next #if($nextPage == 0) disabled #end"><a href="#if($nextPage == 0)# #else /Photos/Collection?name=${collection.urlEncodedName}&number=${nextPage} #end">Next</a></li>
+</ul>
+</div>
+
+#foreach($file in $page)
+<div class="col-md-4 col-sm-6">
+<div class="thumbnail">
+<div style="width:320px; height:240px;">
+<a target="Photo_${file.id}" href="/Photos/ViewPhoto?id=${file.id}&width=1900&height=1080&fit=false"><img src="/Photos/ViewPhoto?id=${file.id}&width=320&height=240"></a>
+</div>
+<div class="caption">
+<p>
+<div style="width:320px; min-height:20px;">
+#foreach($tag in $file.tags)
+<a href="/Photos/Tag?name=${tag}"><span class="label label-primary">$tag</span></a>
+#end
+</div>
+</p>
+
+<form method="post">
+<input type="hidden" name="tagId" value="${file.id}">
+<div class="add-tag input-group input-group-sm">
+<input type="text" name="tag" class="form-control" placeholder="Add tag...">
+</div>
+</form>
+
+</p>
+</div>
+</div>
+</div>
+#end
+
+<div class="col-md-12">
+<ul class="pager">
+  <li class="previous #if($previousPage == 0) disabled #end"><a href="#if($previousPage == 0)# #else /Photos/Collection?name=${collection.urlEncodedName}&number=${previousPage} #end">Previous</a></li>
+  <li>${currentPage} / ${pageCount}</li>
+  <li class="next #if($nextPage == 0) disabled #end"><a href="#if($nextPage == 0)# #else /Photos/Collection?name=${collection.urlEncodedName}&number=${nextPage} #end">Next</a></li>
+</ul>
+</div>
+
+<div class="col-md-12"><hr/><h3>Options</h3></div>
+
+<div class="col-md-3">
+<form method="post">
+<div class="panel panel-default">
+<div class="panel-heading">Set Collection Name</div>
+<table class="table small">
+<tr>
+<td><input type="text" name="${field.name}"/></td>
+<td colspan="3"><button id="Button-SetName" type="button" class="btn btn-primary btn-sm">Set Name</button></td>
+</tr>
+</table>
+</div>
+</form>
+</div>
+
+<div class="col-md-3">
+<form method="post" id="Form-TagAll">
+<div class="panel panel-default">
+<div class="panel-heading">Tag All Photos</div>
+<table class="table small">
+<tr>
+<td><input type="text" name="allTags"/></td>
+<td colspan="3"><button id="Button-TagAll" type="button" class="btn btn-primary btn-sm">Add Tag</button></td>
+</tr>
+</table>
+</div>
+</form>
+</div>
+
+
+<!-- END ROW -->
+</div>
+
+<!-- END CONTAINER -->
+</div>
+
+
+
+<!-- JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js" ></script>
+<script>
+$(document).ready(function() {
+	$('#Button-TagAll').click(function() {
+		$( "#Form-TagAll" ).submit();
+	});
+});
+</script>
+</body>
+</html>
