@@ -6,11 +6,12 @@ import com.robindrew.common.http.servlet.executor.IHttpExecutor;
 import com.robindrew.common.http.servlet.executor.IVelocityHttpContext;
 import com.robindrew.common.service.component.jetty.JettyVelocityComponent;
 import com.robindrew.common.service.component.jetty.handler.MatcherHttpHandler;
-import com.robindrew.common.service.component.jetty.handler.page.BeanAttributePage;
 import com.robindrew.common.service.component.jetty.handler.page.BeanConsolePage;
 import com.robindrew.common.service.component.jetty.handler.page.BeanOperationPage;
 import com.robindrew.common.service.component.jetty.handler.page.BeanViewPage;
+import com.robindrew.common.service.component.jetty.handler.page.GetBeanAttributePage;
 import com.robindrew.common.service.component.jetty.handler.page.IndexPage;
+import com.robindrew.common.service.component.jetty.handler.page.SetBeanAttributePage;
 import com.robindrew.common.service.component.jetty.handler.page.SystemPage;
 import com.robindrew.common.template.ITemplateLocator;
 import com.robindrew.common.template.velocity.VelocityTemplateLocatorSupplier;
@@ -33,12 +34,13 @@ public class JettyComponent extends JettyVelocityComponent {
 	protected void populate(MatcherHttpHandler handler) {
 
 		// Register standard pages
-		handler.uri("/", newIndexPage(getContext(), "site/common/Index.html"));
+		handler.uri("/", new IndexPage(getContext(), "site/common/Index.html"));
 		handler.uri("/System", new SystemPage(getContext(), "site/common/System.html"));
 		handler.uri("/BeanConsole", new BeanConsolePage(getContext(), "site/common/BeanConsole.html"));
 		handler.uri("/BeanView", new BeanViewPage(getContext(), "site/common/BeanView.html"));
-		handler.uri("/BeanAttribute", new BeanAttributePage(getContext(), "site/common/BeanAttribute.html"));
 		handler.uri("/BeanOperation", new BeanOperationPage(getContext(), "site/common/BeanOperation.html"));
+		handler.uri("/GetBeanAttribute", new GetBeanAttributePage(getContext(), "site/common/GetBeanAttribute.html"));
+		handler.uri("/SetBeanAttribute", new SetBeanAttributePage(getContext(), "site/common/SetBeanAttribute.html"));
 
 		// Media manager pages
 		handler.uri("/Photos", new PhotosPage(getContext(), "site/media/Photos.html"));

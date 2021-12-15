@@ -1,0 +1,60 @@
+
+
+// PLUGINS
+apply plugin: 'java'
+apply plugin: 'eclipse'
+
+// ARTIFACT
+version = '1.0.0'
+
+
+// JAVA VERSION
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+
+// COMPILATION
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+
+// SOURCE FILES (What are our source directories)
+sourceSets {
+	main {
+    	java {
+        	srcDir 'src/main/java'
+		}
+	}
+	generated {
+    	java {
+        	srcDir 'src/generated/java'
+		}
+	}
+}
+
+
+// REPOSITORIES (Where to download JAR files from)
+repositories {
+	mavenLocal()
+   	mavenCentral()
+}
+
+
+// DEPENDENCIES (Which JAR files to download and host locally)
+dependencies {
+
+	compile project(":robindrew-common")
+
+	compile group: 'com.google.guava',     		name: 'guava',             	version: '20.0'
+	compile group: 'org.slf4j',        			name: 'slf4j-api',         	version: '1.7.25'
+	compile group: 'org.apache.commons',		name: 'commons-lang3',     	version: '3.0'
+	compile group: 'javax.servlet', 	   		name: 'javax.servlet-api', 	version: '3.1.0'
+	compile group: 'commons-codec',            	name: 'commons-codec',     	version: '1.4'
+	compile group: 'com.thoughtworks.xstream',	name: 'xstream',           	version: '1.4.10'
+	compile group: 'uk.org.lidalia',            name: 'sysout-over-slf4j', 	version: '1.0.2'
+
+	testCompile group: 'junit',            name: 'junit',             version: '4.4'
+	testCompile group: 'ch.qos.logback',   name: 'logback-core',      version: '1.2.3'
+	testCompile group: 'ch.qos.logback',   name: 'logback-classic',   version: '1.2.3'
+}
