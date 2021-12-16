@@ -16,6 +16,7 @@ import com.robindrew.common.collect.Paginator;
 import com.robindrew.common.http.servlet.executor.IVelocityHttpContext;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
 import com.robindrew.common.http.servlet.response.IHttpResponse;
+import com.robindrew.common.properties.map.type.IntegerProperty;
 import com.robindrew.common.service.component.jetty.handler.page.AbstractServicePage;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
@@ -28,7 +29,7 @@ public class PhotoCollectionPage extends AbstractServicePage {
 
 	private static final Logger log = LoggerFactory.getLogger(PhotoCollectionPage.class);
 
-	private static final int DEFAULT_PHOTOS_PER_PAGE = 6;
+	private static final IntegerProperty defaultPhotosPerPage = new IntegerProperty("photos.per.page").defaultValue(6);
 
 	public PhotoCollectionPage(IVelocityHttpContext context, String templateName) {
 		super(context, templateName);
@@ -40,11 +41,12 @@ public class PhotoCollectionPage extends AbstractServicePage {
 
 		String name = request.getString("name");
 		int pageNumber = request.getInteger("number", 1);
-		int pageSize = request.getInteger("size", DEFAULT_PHOTOS_PER_PAGE);
+		int pageSize = request.getInteger("size", defaultPhotosPerPage.get());
 		String tags = request.getString("tag", null);
 		int tagId = request.getInteger("tagId", -1);
 		String allTags = request.getString("allTags", null);
 
+		// Add Tag?
 		if (tags != null && tagId >= 0) {
 			log.info("[Add Tag] #{} -> '{}'", tagId, tags);
 
@@ -58,6 +60,11 @@ public class PhotoCollectionPage extends AbstractServicePage {
 		Set<IMediaFile> files = manager.getMediaFiles();
 		IMediaFileCollection collection = getCollection(files, name);
 		files = collection.getFiles();
+
+		log.info("Collection: " + name);
+		for (IMediaFile file : files) {
+			log.info("File: " + file);
+		}
 
 		// Tag All command
 		if (allTags != null) {
@@ -77,6 +84,7 @@ public class PhotoCollectionPage extends AbstractServicePage {
 		dataMap.put("root", manager.getRootDirectory());
 		dataMap.put("collection", collection);
 		dataMap.put("page", page);
+		dataMap.put("pageSize", pageSize);
 		dataMap.put("previousPage", pageNumber - 1);
 		dataMap.put("currentPage", pageNumber);
 		dataMap.put("nextPage", next.isEmpty() ? 0 : pageNumber + 1);

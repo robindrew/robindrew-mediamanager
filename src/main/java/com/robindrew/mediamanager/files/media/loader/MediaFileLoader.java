@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.io.ByteStreams;
 import com.robindrew.common.image.IImageOutput;
 import com.robindrew.common.image.ImageFormat;
 import com.robindrew.common.image.ImageOutput;
@@ -97,7 +98,7 @@ public class MediaFileLoader implements IMediaFileLoader {
 		this.cacheDirectory = Check.existsDirectory("cacheDirectory", cacheDirectory);
 	}
 
-	public BufferedImage readImageFromFile(IMediaFile mediaFile) {
+	public byte[] readImageFromFile(IMediaFile mediaFile) {
 		try {
 			File file = new File(manager.getRootDirectory(), mediaFile.getSourcePath());
 
@@ -105,12 +106,12 @@ public class MediaFileLoader implements IMediaFileLoader {
 				try (ZipFile zip = new ZipFile(file)) {
 					ZipEntry entry = zip.getEntry(mediaFile.getName());
 					try (InputStream input = zip.getInputStream(entry)) {
-						return Images.toBufferedImage(input);
+						return ByteStreams.toByteArray(input);
 					}
 				}
 			}
 
-			return Images.toBufferedImage(file);
+			return Files.readToBytes(file);
 
 		} catch (Exception e) {
 			throw Java.propagate(e);
@@ -119,7 +120,13 @@ public class MediaFileLoader implements IMediaFileLoader {
 
 	public byte[] getImageData(IMediaFile mediaFile, int width, int height, boolean fit) {
 		try {
-			BufferedImage image = readImageFromFile(mediaFile);
+			byte[] imageData = readImageFromFile(mediaFile);
+
+			if (width == 0 && height == 0) {
+				return imageData;
+			}
+
+			BufferedImage image = Images.toBufferedImage(imageData);
 
 			IImageOutput output = resizeImage(image, width, height, fit);
 			return output.writeToByteArray();

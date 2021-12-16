@@ -2,6 +2,7 @@ package com.robindrew.mediamanager.files.media;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class MediaFileCacheFile implements IMediaFileCache {
 	@Override
 	public IMediaFile getMediaFile(String path, MediaFileType type) {
 		path = normalizePath(path);
-		synchronized (this) {
+		synchronized (cacheFile) {
 			IMediaFile file = pathToFileMap.get(path);
 			if (file == null) {
 				int id = nextId.getAndIncrement();
@@ -54,20 +55,24 @@ public class MediaFileCacheFile implements IMediaFileCache {
 	}
 
 	private void cache(IMediaFile file) {
-		idToFileMap.put(file.getId(), file);
-		pathToFileMap.put(file.getPath(), file);
-		sourcePathSet.add(file.getSourcePath());
+		synchronized (cacheFile) {
+			idToFileMap.put(file.getId(), file);
+			pathToFileMap.put(file.getPath(), file);
+			sourcePathSet.add(file.getSourcePath());
+		}
 	}
 
 	@Override
 	public boolean containsPath(String path) {
 		path = normalizePath(path);
-		return sourcePathSet.contains(path);
+		synchronized (cacheFile) {
+			return sourcePathSet.contains(path);
+		}
 	}
 
 	@Override
 	public Set<IMediaFile> getAll() {
-		synchronized (this) {
+		synchronized (cacheFile) {
 			return ImmutableSet.copyOf(pathToFileMap.values());
 		}
 	}
@@ -77,14 +82,14 @@ public class MediaFileCacheFile implements IMediaFileCache {
 	}
 
 	public int size() {
-		synchronized (this) {
+		synchronized (cacheFile) {
 			return idToFileMap.size();
 		}
 	}
 
 	@Override
 	public void persistAll() {
-		synchronized (this) {
+		synchronized (cacheFile) {
 			if (isEmpty()) {
 				deleteCacheFile();
 			} else {
@@ -123,13 +128,20 @@ public class MediaFileCacheFile implements IMediaFileCache {
 
 		@Override
 		public Iterator<String> iterator() {
-			return new MediaFileIterator();
+			synchronized (cacheFile) {
+				Iterator<IMediaFile> iterator = new ArrayList<>(idToFileMap.values()).iterator();
+				return new MediaFileIterator(iterator);
+			}
 		}
 	}
 
 	private class MediaFileIterator implements Iterator<String> {
 
-		private final Iterator<IMediaFile> iterator = idToFileMap.values().iterator();
+		private final Iterator<IMediaFile> iterator;
+
+		private MediaFileIterator(Iterator<IMediaFile> iterator) {
+			this.iterator = iterator;
+		}
 
 		@Override
 		public boolean hasNext() {
@@ -161,6 +173,9 @@ public class MediaFileCacheFile implements IMediaFileCache {
 
 			IMediaFile file = new MediaFile(id, path, type);
 			cache(file);
+			if (nextId.get() <= id) {
+				nextId.set(id + 1);
+			}
 
 			return true;
 		}

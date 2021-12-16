@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.robindrew.common.mbean.IMBeanRegistry;
 import com.robindrew.common.mbean.annotated.AnnotatedMBeanRegistry;
+import com.robindrew.common.properties.map.type.FileProperty;
 import com.robindrew.common.properties.map.type.IProperty;
 import com.robindrew.common.properties.map.type.IntegerProperty;
 import com.robindrew.common.properties.map.type.StringProperty;
@@ -30,14 +31,16 @@ import com.robindrew.mediamanager.files.media.loader.MediaFileLoader;
 import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
 import com.robindrew.mediamanager.files.media.tag.MediaFileTagCacheFile;
 
+import net.bytebuddy.description.modifier.SynchronizationState;
+
 public class MediaFileComponent extends AbstractIdleComponent implements MediaFileComponentMBean {
 
 	private static final Logger log = LoggerFactory.getLogger(MediaFileComponent.class);
 
 	/** The property "root.directory". */
-	private static final IProperty<String> rootDirectory = new StringProperty("root.directory");
+	private static final IProperty<File> rootDirectory = new FileProperty("root.directory").existsDirectory();
 	private static final IProperty<String> cacheFile = new StringProperty("cache.file");
-	private static final IProperty<String> cacheFileDirectory = new StringProperty("cache.file.directory");
+	private static final IProperty<File> cacheFileDirectory = new FileProperty("cache.file.directory").existsDirectory().createDirectory();
 	private static final IProperty<String> tagCacheFile = new StringProperty("tag.cache.file");
 	private static final IProperty<Integer> backgroundLoaderThreads = new IntegerProperty("background.loader.threads").defaultValue(2);
 
@@ -54,11 +57,11 @@ public class MediaFileComponent extends AbstractIdleComponent implements MediaFi
 		// File Manager
 		IMediaFileCache cache = new MediaFileCacheFile(new File(cacheFile.get()));
 		IMediaFileTagCache tagCache = new MediaFileTagCacheFile(new File(tagCacheFile.get()));
-		IFileManager manager = new FileManager(new File(rootDirectory.get()), cache);
+		IFileManager manager = new FileManager(rootDirectory.get(), cache);
 		setDependency(IFileManager.class, manager);
 		setDependency(IMediaFileTagCache.class, tagCache);
 
-		IMediaFileLoader loader = new MediaFileLoader(manager, new File(cacheFileDirectory.get()));
+		IMediaFileLoader loader = new MediaFileLoader(manager, cacheFileDirectory.get());
 		setDependency(IMediaFileLoader.class, loader);
 
 		log.info("Loading Media Files in {} ...", cacheFileDirectory.get());
@@ -79,7 +82,7 @@ public class MediaFileComponent extends AbstractIdleComponent implements MediaFi
 	}
 
 	private void loadImagesInBackground(IMediaFileLoader loader, Set<IMediaFile> files, int threads) {
-		ExecutorService pool = Threads.newFixedThreadPool("BackgroundImageLoader", threads);
+		ExecutorService pool = Threads.newFixedThreadPool("BackgroundImageLoader-%d", threads);
 		for (IMediaFile file : files) {
 			if (file.getType().getType().equals(MediaType.PHOTO)) {
 				pool.submit(new Runnable() {

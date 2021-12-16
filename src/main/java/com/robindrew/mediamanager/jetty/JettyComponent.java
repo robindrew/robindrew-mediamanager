@@ -34,7 +34,7 @@ public class JettyComponent extends JettyVelocityComponent {
 	protected void populate(MatcherHttpHandler handler) {
 
 		// Register standard pages
-		handler.uri("/", new IndexPage(getContext(), "site/common/Index.html"));
+		handler.uri("/", newIndexPage(getContext(), "site/common/Index.html"));
 		handler.uri("/System", new SystemPage(getContext(), "site/common/System.html"));
 		handler.uri("/BeanConsole", new BeanConsolePage(getContext(), "site/common/BeanConsole.html"));
 		handler.uri("/BeanView", new BeanViewPage(getContext(), "site/common/BeanView.html"));
@@ -46,7 +46,7 @@ public class JettyComponent extends JettyVelocityComponent {
 		handler.uri("/Photos", new PhotosPage(getContext(), "site/media/Photos.html"));
 		handler.uri("/Photos/Tag", new PhotoTagPage(getContext(), "site/media/photos/Tag.html"));
 		handler.uri("/Photos/Collection", new PhotoCollectionPage(getContext(), "site/media/photos/Collection.html"));
-		handler.uri("/Photos/ViewPhoto", new ViewPhotoExecutor());
+		handler.uriPattern("/Photos/ViewPhoto/.*", new ViewPhotoExecutor());
 
 		handler.uri("/Videos", new VideosPage(getContext(), "site/media/Videos.html"));
 		handler.uri("/Videos/Collection", new VideoCollectionPage(getContext(), "site/media/videos/Collection.html"));

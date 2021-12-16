@@ -21,6 +21,12 @@ public class ViewPhotoExecutor implements IHttpExecutor {
 		int height = request.getInteger("height", 0);
 		boolean fit = request.getBoolean("fit", true);
 
+		// Special case
+		if (request.getRequestURI().endsWith(".GIF")) {
+			width = 0;
+			height = 0;
+		}
+
 		IFileManager manager = getDependency(IFileManager.class);
 		IMediaFile mediaFile = manager.getMediaFile(id);
 
