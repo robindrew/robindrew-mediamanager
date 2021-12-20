@@ -7,9 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.common.base.Splitter;
 import com.robindrew.common.collect.IPaginator;
 import com.robindrew.common.collect.Paginator;
@@ -24,10 +21,9 @@ import com.robindrew.mediamanager.files.media.IMediaFileCollection;
 import com.robindrew.mediamanager.files.media.MediaFileCollection;
 import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
 import com.robindrew.mediamanager.files.media.tag.MediaFileTag;
+import com.robindrew.mediamanager.jetty.page.action.ModifyTagAction;
 
 public class PhotoCollectionPage extends AbstractServicePage {
-
-	private static final Logger log = LoggerFactory.getLogger(PhotoCollectionPage.class);
 
 	private static final IntegerProperty defaultPhotosPerPage = new IntegerProperty("photos.per.page").defaultValue(6);
 
@@ -46,25 +42,12 @@ public class PhotoCollectionPage extends AbstractServicePage {
 		int tagId = request.getInteger("tagId", -1);
 		String allTags = request.getString("allTags", null);
 
-		// Add Tag?
-		if (tags != null && tagId >= 0) {
-			log.info("[Add Tag] #{} -> '{}'", tagId, tags);
-
-			IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
-			for (String tag : Splitter.on(',').omitEmptyStrings().trimResults().split(tags)) {
-				cache.add(new MediaFileTag(tagId, tag));
-			}
-		}
+		new ModifyTagAction().execute(tags, tagId);
 
 		IFileManager manager = getDependency(IFileManager.class);
 		Set<IMediaFile> files = manager.getMediaFiles();
 		IMediaFileCollection collection = getCollection(files, name);
 		files = collection.getFiles();
-
-		log.info("Collection: " + name);
-		for (IMediaFile file : files) {
-			log.info("File: " + file);
-		}
 
 		// Tag All command
 		if (allTags != null) {

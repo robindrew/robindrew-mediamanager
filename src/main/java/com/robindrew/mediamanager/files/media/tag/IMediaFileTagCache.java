@@ -12,4 +12,8 @@ public interface IMediaFileTagCache extends Iterable<IMediaFileTag> {
 
 	void add(IMediaFileTag tag);
 
+	void remove(IMediaFileTag tag);
+
+	void removeAll(int id);
+
 }

@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.robindrew.common.collect.IPaginator;
 import com.robindrew.common.collect.Paginator;
 import com.robindrew.common.http.servlet.executor.IVelocityHttpContext;
@@ -19,12 +16,11 @@ import com.robindrew.common.service.component.jetty.handler.page.AbstractService
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.tag.IMediaFileTag;
 import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
+import com.robindrew.mediamanager.jetty.page.action.ModifyTagAction;
 import com.robindrew.mediamanager.jetty.page.view.MediaFileTagView;
 
 public class PhotoTagPage extends AbstractServicePage {
 
-	private static final Logger log = LoggerFactory.getLogger(PhotoTagPage.class);
-	
 	private static final IntegerProperty defaultPhotosPerPage = new IntegerProperty("photos.per.page").defaultValue(6);
 
 	public PhotoTagPage(IVelocityHttpContext context, String templateName) {
@@ -38,22 +34,21 @@ public class PhotoTagPage extends AbstractServicePage {
 		String name = request.getString("name");
 		int pageNumber = request.getInteger("number", 1);
 		int pageSize = request.getInteger("size", defaultPhotosPerPage.get());
+		int tagId = request.getInteger("tagId", -1);
+		String tags = request.getString("tag", null);
+
+		new ModifyTagAction().execute(tags, tagId);
 
 		IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
-		Set<IMediaFileTag> tags = cache.getTags(name);
-		
+		Set<IMediaFileTag> tagSet = cache.getTags(name);
+
 		IFileManager manager = getDependency(IFileManager.class);
-		Set<MediaFileTagView> views = MediaFileTagView.from(manager, tags);
+		Set<MediaFileTagView> views = MediaFileTagView.from(manager, tagSet);
 
 		IPaginator<MediaFileTagView> paginator = new Paginator<>(views);
 		List<MediaFileTagView> page = paginator.getPage(pageNumber, pageSize);
 		List<MediaFileTagView> next = paginator.getPage(pageNumber + 1, pageSize);
 		int pageCount = paginator.getPageCount(pageSize);
-
-		log.info("Tag: " + name);
-		for (IMediaFileTag file : tags) {
-			log.info("Tag: " + file);
-		}
 
 		dataMap.put("name", name);
 		dataMap.put("tags", views);

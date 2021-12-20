@@ -3,6 +3,7 @@ package com.robindrew.mediamanager.files.media.tag;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -85,6 +86,18 @@ public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> 
 	}
 
 	@Override
+	public void remove(IMediaFileTag tag) {
+		synchronized (this) {
+			Set<IMediaFileTag> set = new LinkedHashSet<>(getAll());
+			int size = set.size();
+			set.remove(tag);
+			if (set.size() < size) {
+				setAll(set);
+			}
+		}
+	}
+
+	@Override
 	public Set<String> getTagNames(int id) {
 		Set<IMediaFileTag> tags;
 		synchronized (this) {
@@ -119,6 +132,27 @@ public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> 
 	@Override
 	public String formatToLine(IMediaFileTag element) {
 		return element.getId() + "," + element.getName();
+	}
+
+	@Override
+	public void removeAll(int id) {
+		synchronized (this) {
+			Set<IMediaFileTag> set = new LinkedHashSet<>(getAll());
+			boolean modified = false;
+
+			Iterator<IMediaFileTag> iterator = set.iterator();
+			while (iterator.hasNext()) {
+				IMediaFileTag tag = iterator.next();
+				if (tag.getId() == id) {
+					log.info("[Remove] id={}, name={}", tag.getId(), tag.getName());
+					iterator.remove();
+					modified = true;
+				}
+			}
+			if (modified) {
+				setAll(set);
+			}
+		}
 	}
 
 }
