@@ -14,4 +14,6 @@ public interface IMediaFileCollection {
 
 	Set<IMediaFile> getFiles();
 
+	boolean contains(int id);
+
 }

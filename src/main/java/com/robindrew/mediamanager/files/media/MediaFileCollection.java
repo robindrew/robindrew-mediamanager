@@ -77,4 +77,14 @@ public class MediaFileCollection implements IMediaFileCollection {
 		return count;
 	}
 
+	@Override
+	public boolean contains(int id) {
+		for (IMediaFile file : getFiles()) {
+			if (file.getId() == id) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 }

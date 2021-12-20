@@ -70,10 +70,10 @@ a:link, a:visited a:link:active, a:visited:active {
 <div class="caption">
 #if($file.file.tags.size() > 0)
 <p>
+<a href="/Photos/Collection?name=${file.file.id}&type=id"><span class="label label-primary">:</span></a>
 #foreach($tag in $file.file.tags)
-<span class="label label-primary">$tag</span>
+<a href="/Photos/Tag?name=${tag}"><span class="label label-primary">${tag}</span></a>
 #end
-<span class="label">&nbsp;</span>
 </p>
 #end
 

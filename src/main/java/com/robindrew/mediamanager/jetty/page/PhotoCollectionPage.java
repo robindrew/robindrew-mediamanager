@@ -2,6 +2,7 @@ package com.robindrew.mediamanager.jetty.page;
 
 import static com.robindrew.common.dependency.DependencyFactory.getDependency;
 import static com.robindrew.mediamanager.files.media.MediaType.PHOTO;
+import static com.robindrew.mediamanager.files.media.MediaType.VIDEO;
 
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ public class PhotoCollectionPage extends AbstractServicePage {
 		super.execute(request, response, dataMap);
 
 		String name = request.getString("name");
+		String type = request.getString("type", "name");
 		int pageNumber = request.getInteger("number", 1);
 		int pageSize = request.getInteger("size", defaultPhotosPerPage.get());
 		String tags = request.getString("tag", null);
@@ -46,7 +48,7 @@ public class PhotoCollectionPage extends AbstractServicePage {
 
 		IFileManager manager = getDependency(IFileManager.class);
 		Set<IMediaFile> files = manager.getMediaFiles();
-		IMediaFileCollection collection = getCollection(files, name);
+		IMediaFileCollection collection = getCollection(files, name, type);
 		files = collection.getFiles();
 
 		// Tag All command
@@ -74,11 +76,21 @@ public class PhotoCollectionPage extends AbstractServicePage {
 		dataMap.put("pageCount", pageCount);
 	}
 
-	private IMediaFileCollection getCollection(Set<IMediaFile> files, String name) {
+	private IMediaFileCollection getCollection(Set<IMediaFile> files, String name, String type) {
 		Set<IMediaFileCollection> collections = MediaFileCollection.splitToSetWithType(PHOTO, files);
-		for (IMediaFileCollection collection : collections) {
-			if (collection.getName().equals(name)) {
-				return collection;
+		if (type.equals("name")) {
+			for (IMediaFileCollection collection : collections) {
+				if (collection.getName().equals(name)) {
+					return collection;
+				}
+			}
+		}
+		if (type.equals("id")) {
+			int id = Integer.parseInt(name);
+			for (IMediaFileCollection collection : collections) {
+				if (collection.contains(id)) {
+					return collection;
+				}
 			}
 		}
 		throw new IllegalArgumentException("name=" + name);

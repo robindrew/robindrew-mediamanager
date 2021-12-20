@@ -39,6 +39,7 @@ public class VideoCollectionPage extends AbstractServicePage {
 		super.execute(request, response, dataMap);
 
 		String name = request.getString("name");
+		String type = request.getString("type", "name");
 		int pageNumber = request.getInteger("number", 1);
 		int pageSize = request.getInteger("size", DEFAULT_PHOTOS_PER_PAGE);
 		String tags = request.getString("tag", null);
@@ -55,7 +56,7 @@ public class VideoCollectionPage extends AbstractServicePage {
 
 		IFileManager manager = getDependency(IFileManager.class);
 		Set<IMediaFile> files = manager.getMediaFiles();
-		IMediaFileCollection collection = getCollection(files, name);
+		IMediaFileCollection collection = getCollection(files, name, type);
 		files = collection.getFiles();
 
 		IPaginator<IMediaFile> paginator = new Paginator<>(files);
@@ -72,11 +73,21 @@ public class VideoCollectionPage extends AbstractServicePage {
 		dataMap.put("pageCount", pageCount);
 	}
 
-	private IMediaFileCollection getCollection(Set<IMediaFile> files, String name) {
+	private IMediaFileCollection getCollection(Set<IMediaFile> files, String name, String type) {
 		Set<IMediaFileCollection> collections = MediaFileCollection.splitToSetWithType(VIDEO, files);
-		for (IMediaFileCollection collection : collections) {
-			if (collection.getName().equals(name)) {
-				return collection;
+		if (type.equals("name")) {
+			for (IMediaFileCollection collection : collections) {
+				if (collection.getName().equals(name)) {
+					return collection;
+				}
+			}
+		}
+		if (type.equals("id")) {
+			int id = Integer.parseInt(name);
+			for (IMediaFileCollection collection : collections) {
+				if (collection.contains(id)) {
+					return collection;
+				}
 			}
 		}
 		throw new IllegalArgumentException("name=" + name);
