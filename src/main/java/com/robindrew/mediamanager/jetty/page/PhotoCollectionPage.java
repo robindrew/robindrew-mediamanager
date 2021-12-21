@@ -2,7 +2,6 @@ package com.robindrew.mediamanager.jetty.page;
 
 import static com.robindrew.common.dependency.DependencyFactory.getDependency;
 import static com.robindrew.mediamanager.files.media.MediaType.PHOTO;
-import static com.robindrew.mediamanager.files.media.MediaType.VIDEO;
 
 import java.util.List;
 import java.util.Map;

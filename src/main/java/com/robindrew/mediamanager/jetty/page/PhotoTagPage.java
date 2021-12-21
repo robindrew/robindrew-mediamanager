@@ -53,6 +53,7 @@ public class PhotoTagPage extends AbstractServicePage {
 		dataMap.put("name", name);
 		dataMap.put("tags", views);
 		dataMap.put("page", page);
+		dataMap.put("pageSize", pageSize);
 		dataMap.put("previousPage", pageNumber - 1);
 		dataMap.put("currentPage", pageNumber);
 		dataMap.put("nextPage", next.isEmpty() ? 0 : pageNumber + 1);
