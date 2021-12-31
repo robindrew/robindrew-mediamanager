@@ -31,8 +31,6 @@ import com.robindrew.mediamanager.files.media.loader.MediaFileLoader;
 import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
 import com.robindrew.mediamanager.files.media.tag.MediaFileTagCacheFile;
 
-import net.bytebuddy.description.modifier.SynchronizationState;
-
 public class MediaFileComponent extends AbstractIdleComponent implements MediaFileComponentMBean {
 
 	private static final Logger log = LoggerFactory.getLogger(MediaFileComponent.class);
