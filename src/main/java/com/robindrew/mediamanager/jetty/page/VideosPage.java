@@ -3,6 +3,7 @@ package com.robindrew.mediamanager.jetty.page;
 import static com.robindrew.common.dependency.DependencyFactory.getDependency;
 import static com.robindrew.mediamanager.files.media.MediaType.VIDEO;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class VideosPage extends AbstractServicePage {
 
 		IFileManager manager = getDependency(IFileManager.class);
 		Set<IMediaFile> files = manager.getMediaFiles();
-		Set<IMediaFileCollection> collections = MediaFileCollection.splitToSetWithType(VIDEO, files);
+		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(VIDEO, files);
 
 		IMediaFileTagCache tagCache = getDependency(IMediaFileTagCache.class);
 

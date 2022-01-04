@@ -74,7 +74,7 @@ public class VideoCollectionPage extends AbstractServicePage {
 	}
 
 	private IMediaFileCollection getCollection(Set<IMediaFile> files, String name, String type) {
-		Set<IMediaFileCollection> collections = MediaFileCollection.splitToSetWithType(VIDEO, files);
+		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(VIDEO, files);
 		if (type.equals("name")) {
 			for (IMediaFileCollection collection : collections) {
 				if (collection.getName().equals(name)) {

@@ -1,7 +1,8 @@
 package com.robindrew.mediamanager.files.media;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import com.google.common.collect.ImmutableSet;
@@ -12,7 +13,7 @@ import com.robindrew.common.util.Check;
 
 public class MediaFileCollection implements IMediaFileCollection {
 
-	public static Set<IMediaFileCollection> splitToSetWithType(MediaType type, Collection<? extends IMediaFile> files) {
+	public static List<IMediaFileCollection> splitToListWithType(MediaType type, Collection<? extends IMediaFile> files) {
 
 		SetMultimap<String, IMediaFile> collectionMap = SetMultimapBuilder.treeKeys().linkedHashSetValues().build();
 		for (IMediaFile file : files) {
@@ -21,7 +22,7 @@ public class MediaFileCollection implements IMediaFileCollection {
 			}
 		}
 
-		Set<IMediaFileCollection> collections = new LinkedHashSet<>();
+		List<IMediaFileCollection> collections = new ArrayList<>();
 		for (String key : collectionMap.keySet()) {
 			collections.add(new MediaFileCollection(key, collectionMap.get(key)));
 		}

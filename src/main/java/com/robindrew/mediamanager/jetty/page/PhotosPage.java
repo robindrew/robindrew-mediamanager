@@ -3,6 +3,7 @@ package com.robindrew.mediamanager.jetty.page;
 import static com.robindrew.common.dependency.DependencyFactory.getDependency;
 import static com.robindrew.mediamanager.files.media.MediaType.PHOTO;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,7 +29,7 @@ public class PhotosPage extends AbstractServicePage {
 
 		IFileManager manager = getDependency(IFileManager.class);
 		Set<IMediaFile> files = manager.getMediaFiles();
-		Set<IMediaFileCollection> collections = MediaFileCollection.splitToSetWithType(PHOTO, files);
+		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(PHOTO, files);
 
 		IMediaFileTagCache tagCache = getDependency(IMediaFileTagCache.class);
 

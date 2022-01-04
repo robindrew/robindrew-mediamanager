@@ -47,8 +47,14 @@ public class PhotoCollectionPage extends AbstractServicePage {
 
 		IFileManager manager = getDependency(IFileManager.class);
 		Set<IMediaFile> files = manager.getMediaFiles();
-		IMediaFileCollection collection = getCollection(files, name, type);
+		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(PHOTO, files);
+
+		int index = indexOf(collections, name, type);
+		IMediaFileCollection collection = collections.get(index);
 		files = collection.getFiles();
+
+		String nextName = (index == (collections.size() - 1)) ? name : collections.get(index + 1).getName();
+		String prevName = (index == 0) ? name : collections.get(index - 1).getName();
 
 		// Tag All command
 		if (allTags != null) {
@@ -73,26 +79,29 @@ public class PhotoCollectionPage extends AbstractServicePage {
 		dataMap.put("currentPage", pageNumber);
 		dataMap.put("nextPage", next.isEmpty() ? 0 : pageNumber + 1);
 		dataMap.put("pageCount", pageCount);
+		dataMap.put("prevName", prevName);
+		dataMap.put("nextName", nextName);
 	}
 
-	private IMediaFileCollection getCollection(Set<IMediaFile> files, String name, String type) {
-		Set<IMediaFileCollection> collections = MediaFileCollection.splitToSetWithType(PHOTO, files);
+	private int indexOf(List<IMediaFileCollection> collections, String name, String type) {
 		if (type.equals("name")) {
-			for (IMediaFileCollection collection : collections) {
+			for (int i = 0; i < collections.size(); i++) {
+				IMediaFileCollection collection = collections.get(i);
 				if (collection.getName().equals(name)) {
-					return collection;
+					return i;
 				}
 			}
 		}
 		if (type.equals("id")) {
 			int id = Integer.parseInt(name);
-			for (IMediaFileCollection collection : collections) {
+			for (int i = 0; i < collections.size(); i++) {
+				IMediaFileCollection collection = collections.get(i);
 				if (collection.contains(id)) {
-					return collection;
+					return i;
 				}
 			}
 		}
-		throw new IllegalArgumentException("name=" + name);
+		throw new IllegalArgumentException("name=" + name + ", type=" + type);
 	}
 
 }
