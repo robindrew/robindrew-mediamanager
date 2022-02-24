@@ -159,6 +159,9 @@ public class MediaFileCacheFile implements IMediaFileCache {
 
 		@Override
 		public boolean processLine(String line) throws IOException {
+			if (line.trim().isEmpty()) {
+				return true;
+			}
 
 			// Parse the id
 			int comma1 = line.indexOf(',');
