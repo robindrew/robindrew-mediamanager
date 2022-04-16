@@ -1,7 +1,7 @@
 package com.robindrew.mediamanager.jetty.page;
 
 import static com.robindrew.common.dependency.DependencyFactory.getDependency;
-import static com.robindrew.mediamanager.files.media.MediaType.PHOTO;
+import static com.robindrew.mediamanager.files.media.MediaType.VIDEO;
 
 import java.util.List;
 import java.util.Map;
@@ -20,11 +20,11 @@ import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
 import com.robindrew.mediamanager.jetty.page.action.ModifyTagAction;
 import com.robindrew.mediamanager.jetty.page.view.MediaFileTagView;
 
-public class PhotoTagPage extends AbstractServicePage {
+public class VideoTagPage extends AbstractServicePage {
 
-	private static final IntegerProperty defaultPhotosPerPage = new IntegerProperty("photos.per.page").defaultValue(6);
+	private static final IntegerProperty defaultVideosPerPage = new IntegerProperty("videos.per.page").defaultValue(3);
 
-	public PhotoTagPage(IVelocityHttpContext context, String templateName) {
+	public VideoTagPage(IVelocityHttpContext context, String templateName) {
 		super(context, templateName);
 	}
 
@@ -34,7 +34,7 @@ public class PhotoTagPage extends AbstractServicePage {
 
 		String name = request.getString("name");
 		int pageNumber = request.getInteger("number", 1);
-		int pageSize = request.getInteger("size", defaultPhotosPerPage.get());
+		int pageSize = request.getInteger("size", defaultVideosPerPage.get());
 		int tagId = request.getInteger("tagId", -1);
 		String tags = request.getString("tag", null);
 
@@ -44,7 +44,7 @@ public class PhotoTagPage extends AbstractServicePage {
 		Set<IMediaFileTag> tagSet = cache.getTags(name);
 
 		IFileManager manager = getDependency(IFileManager.class);
-		Set<MediaFileTagView> views = MediaFileTagView.from(manager, tagSet, PHOTO);
+		Set<MediaFileTagView> views = MediaFileTagView.from(manager, tagSet, VIDEO);
 
 		IPaginator<MediaFileTagView> paginator = new Paginator<>(views);
 		List<MediaFileTagView> page = paginator.getPage(pageNumber, pageSize);

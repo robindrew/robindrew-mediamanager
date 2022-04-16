@@ -21,6 +21,7 @@ import com.robindrew.mediamanager.jetty.page.PhotoCollectionPage;
 import com.robindrew.mediamanager.jetty.page.PhotoTagPage;
 import com.robindrew.mediamanager.jetty.page.PhotosPage;
 import com.robindrew.mediamanager.jetty.page.VideoCollectionPage;
+import com.robindrew.mediamanager.jetty.page.VideoTagPage;
 import com.robindrew.mediamanager.jetty.page.VideosPage;
 
 public class JettyComponent extends JettyVelocityComponent {
@@ -49,6 +50,7 @@ public class JettyComponent extends JettyVelocityComponent {
 		handler.uriPattern("/Photos/ViewPhoto/.*", new ViewPhotoExecutor());
 
 		handler.uri("/Videos", new VideosPage(getContext(), "site/media/Videos.html"));
+		handler.uri("/Videos/Tag", new VideoTagPage(getContext(), "site/media/videos/Tag.html"));
 		handler.uri("/Videos/Collection", new VideoCollectionPage(getContext(), "site/media/videos/Collection.html"));
 		handler.uri("/Videos/ViewVideo", new ViewVideoExecutor());
 	}

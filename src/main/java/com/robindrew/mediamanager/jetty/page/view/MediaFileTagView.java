@@ -6,15 +6,18 @@ import java.util.Set;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.MediaFileType;
+import com.robindrew.mediamanager.files.media.MediaType;
 import com.robindrew.mediamanager.files.media.tag.IMediaFileTag;
 
 public class MediaFileTagView {
 
-	public static Set<MediaFileTagView> from(IFileManager manager, Set<IMediaFileTag> tags) {
+	public static Set<MediaFileTagView> from(IFileManager manager, Set<IMediaFileTag> tags, MediaType type) {
 		Set<MediaFileTagView> set = new LinkedHashSet<>();
 		for (IMediaFileTag tag : tags) {
 			IMediaFile file = manager.getMediaFile(tag.getId());
-			set.add(new MediaFileTagView(tag, file));	
+			if (file.getType().getType().equals(type)) {
+				set.add(new MediaFileTagView(tag, file));
+			}
 		}
 		return set;
 	}

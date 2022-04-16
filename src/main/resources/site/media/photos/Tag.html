@@ -51,7 +51,7 @@ a:link, a:visited a:link:active, a:visited:active {
 <hr/>
 </div>
 
-#if($pageSize > 1)
+#if($pageCount > 1)
 <div class="col-md-12">
 <ul class="pager">
   <li class="previous #if($previousPage == 0) disabled #end"><a href="#if($previousPage == 0)# #else /Photos/Tag?name=${name}&number=${previousPage} #end">Previous</a></li>
@@ -90,7 +90,7 @@ a:link, a:visited a:link:active, a:visited:active {
 </div>
 #end
 
-#if($pageSize > 1)
+#if($pageCount > 1)
 <div class="col-md-12">
 <ul class="pager">
   <li class="previous #if($previousPage == 0) disabled #end"><a href="#if($previousPage == 0)# #else /Photos/Tag?name=${name}&number=${previousPage} #end">Previous</a></li>
