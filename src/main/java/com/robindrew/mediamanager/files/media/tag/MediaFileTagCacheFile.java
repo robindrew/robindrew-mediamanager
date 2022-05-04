@@ -25,11 +25,14 @@ public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> 
 	private final SetMultimap<String, IMediaFileTag> nameCache = SetMultimapBuilder.treeKeys().treeSetValues().build();
 	private final SetMultimap<Integer, IMediaFileTag> idCache = SetMultimapBuilder.treeKeys().treeSetValues().build();
 
-	public MediaFileTagCacheFile(File file) {
+	public MediaFileTagCacheFile(TagNumberFile tagFile, File file) {
 		super(file);
 
 		List<IMediaFileTag> tags = getAll();
 		log.info("Loaded {} tags", tags.size());
+		for (IMediaFileTag tag : tags) {
+			tagFile.getNumber(tag.getName());
+		}
 		updateMaps();
 	}
 

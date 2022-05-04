@@ -30,6 +30,7 @@ import com.robindrew.mediamanager.files.media.loader.IMediaFileLoader;
 import com.robindrew.mediamanager.files.media.loader.MediaFileLoader;
 import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
 import com.robindrew.mediamanager.files.media.tag.MediaFileTagCacheFile;
+import com.robindrew.mediamanager.files.media.tag.TagNumberFile;
 
 public class MediaFileComponent extends AbstractIdleComponent implements MediaFileComponentMBean {
 
@@ -39,7 +40,8 @@ public class MediaFileComponent extends AbstractIdleComponent implements MediaFi
 	private static final IProperty<File> rootDirectory = new FileProperty("root.directory").existsDirectory();
 	private static final IProperty<String> cacheFile = new StringProperty("cache.file");
 	private static final IProperty<File> cacheFileDirectory = new FileProperty("cache.file.directory").existsDirectory().createDirectory();
-	private static final IProperty<String> tagCacheFile = new StringProperty("tag.cache.file");
+	private static final IProperty<File> tagCacheFile = new FileProperty("tag.cache.file");
+	private static final IProperty<File> tagNumberFile = new FileProperty("tag.number.file");
 	private static final IProperty<Integer> backgroundLoaderThreads = new IntegerProperty("background.loader.threads").defaultValue(2);
 
 	public IFileManager getManager() {
@@ -54,7 +56,7 @@ public class MediaFileComponent extends AbstractIdleComponent implements MediaFi
 
 		// File Manager
 		IMediaFileCache cache = new MediaFileCacheFile(new File(cacheFile.get()));
-		IMediaFileTagCache tagCache = new MediaFileTagCacheFile(new File(tagCacheFile.get()));
+		IMediaFileTagCache tagCache = new MediaFileTagCacheFile(new TagNumberFile(tagNumberFile.get()), tagCacheFile.get());
 		IFileManager manager = new FileManager(rootDirectory.get(), cache);
 		setDependency(IFileManager.class, manager);
 		setDependency(IMediaFileTagCache.class, tagCache);
