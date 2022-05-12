@@ -65,9 +65,9 @@ a:link, a:visited a:link:active, a:visited:active {
 <div class="col-md-4 col-sm-6">
 <div class="thumbnail">
 <div style="width:320px; height:240px;">
-<video width="320">
-  <source src="/Videos/ViewVideo?id=${file.id}" type="video/mp4">
-</video>
+<a href="/Videos/ViewVideo?id=${file.id}" target="_video${file.id}">
+<img src="/Videos/ViewVideoFrame?id=${file.id}&s=5"/>
+</a>
 </div>
 <div class="caption">
 #if($file.file.tags.size() > 0)

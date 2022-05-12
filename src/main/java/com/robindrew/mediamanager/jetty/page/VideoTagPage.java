@@ -24,7 +24,7 @@ import com.robindrew.mediamanager.jetty.page.view.MediaFileTagView;
 
 public class VideoTagPage extends AbstractServicePage {
 
-	private static final IntegerProperty defaultVideosPerPage = new IntegerProperty("videos.per.page").defaultValue(3);
+	private static final IntegerProperty defaultVideosPerPage = new IntegerProperty("videos.per.page").defaultValue(9);
 
 	public VideoTagPage(IVelocityHttpContext context, String templateName) {
 		super(context, templateName);
