@@ -46,6 +46,8 @@ dependencies {
 
 	implementation project(":robindrew-common")
 
+	implementation 'org.jcodec:jcodec-javase:0.2.5'
+	implementation 'org.jcodec:jcodec:0.2.5'
 	implementation group: 'com.google.guava',     		name: 'guava',             	version: '20.0'
 	implementation group: 'org.slf4j',        			name: 'slf4j-api',         	version: '1.7.25'
 	implementation group: 'org.apache.commons',		name: 'commons-lang3',     	version: '3.0'

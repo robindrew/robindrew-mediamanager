@@ -19,8 +19,7 @@ import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.IMediaFileCollection;
 import com.robindrew.mediamanager.files.media.MediaFileCollection;
-import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
-import com.robindrew.mediamanager.files.media.tag.MediaFileTag;
+import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
 import com.robindrew.mediamanager.jetty.page.action.ModifyTagAction;
 
 public class VideoCollectionPage extends AbstractServicePage {
@@ -59,9 +58,9 @@ public class VideoCollectionPage extends AbstractServicePage {
 		// Tag All command
 		if (allTags != null) {
 			IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
-			for (String tag : Splitter.on(',').omitEmptyStrings().trimResults().split(allTags)) {
+			for (String tagName : Splitter.on(',').omitEmptyStrings().trimResults().split(allTags)) {
 				for (IMediaFile file : files) {
-					cache.add(new MediaFileTag(file.getId(), tag));
+					cache.add(file.getId(), tagName);
 				}
 			}
 		}

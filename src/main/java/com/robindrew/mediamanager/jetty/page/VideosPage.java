@@ -15,7 +15,7 @@ import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.IMediaFileCollection;
 import com.robindrew.mediamanager.files.media.MediaFileCollection;
-import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
+import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
 
 public class VideosPage extends AbstractServicePage {
 

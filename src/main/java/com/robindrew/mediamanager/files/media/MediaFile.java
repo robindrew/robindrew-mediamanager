@@ -1,10 +1,12 @@
 package com.robindrew.mediamanager.files.media;
 
+import java.io.File;
 import java.util.Set;
 
 import com.robindrew.common.dependency.DependencyFactory;
 import com.robindrew.common.util.Check;
-import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
+import com.robindrew.mediamanager.files.media.tag.ITag;
+import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
 
 public class MediaFile implements IMediaFile {
 
@@ -90,9 +92,14 @@ public class MediaFile implements IMediaFile {
 	}
 
 	@Override
-	public Set<String> getTags() {
+	public Set<ITag> getTags() {
 		IMediaFileTagCache cache = DependencyFactory.getDependency(IMediaFileTagCache.class);
-		return cache.getTagNames(getId());
+		return cache.getTags(getId());
+	}
+
+	@Override
+	public IMediaFrame getFrame(File file, double timestamp) {
+		return new MediaFrame(file, timestamp);
 	}
 
 }

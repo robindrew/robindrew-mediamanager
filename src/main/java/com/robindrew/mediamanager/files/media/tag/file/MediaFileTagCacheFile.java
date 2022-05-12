@@ -1,8 +1,7 @@
-package com.robindrew.mediamanager.files.media.tag;
+package com.robindrew.mediamanager.files.media.tag.file;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -17,22 +16,20 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MultimapBuilder.SetMultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import com.robindrew.common.io.file.objectstore.CachedObjectStoreFile;
+import com.robindrew.mediamanager.files.media.tag.ITag;
+import com.robindrew.mediamanager.files.media.tag.ITagCache;
 
 public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> implements IMediaFileTagCache {
 
 	private static final Logger log = LoggerFactory.getLogger(MediaFileTagCacheFile.class);
 
-	private final SetMultimap<String, IMediaFileTag> nameCache = SetMultimapBuilder.treeKeys().treeSetValues().build();
-	private final SetMultimap<Integer, IMediaFileTag> idCache = SetMultimapBuilder.treeKeys().treeSetValues().build();
+	private final ITagCache tagCache;
+	private final SetMultimap<String, IMediaFileTag> tagNameCache = SetMultimapBuilder.treeKeys().treeSetValues().build();
+	private final SetMultimap<Integer, IMediaFileTag> fileIdCache = SetMultimapBuilder.treeKeys().treeSetValues().build();
 
-	public MediaFileTagCacheFile(TagNumberFile tagFile, File file) {
+	public MediaFileTagCacheFile(ITagCache tagCache, File file) {
 		super(file);
-
-		List<IMediaFileTag> tags = getAll();
-		log.info("Loaded {} tags", tags.size());
-		for (IMediaFileTag tag : tags) {
-			tagFile.getNumber(tag.getName());
-		}
+		this.tagCache = tagCache;
 		updateMaps();
 	}
 
@@ -53,27 +50,30 @@ public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> 
 
 	private void updateMaps() {
 		synchronized (this) {
-			nameCache.clear();
-			idCache.clear();
+			tagNameCache.clear();
+			fileIdCache.clear();
 			for (IMediaFileTag tag : getAll()) {
-				nameCache.put(tag.getName(), tag);
-				idCache.put(tag.getId(), tag);
+				tagNameCache.put(tag.getTag().getName(), tag);
+				fileIdCache.put(tag.getFileId(), tag);
 			}
 		}
 	}
 
 	@Override
-	public Set<String> getTagNames() {
+	public Set<ITag> getTags() {
+		return tagCache.getTags();
+	}
+
+	@Override
+	public Set<IMediaFileTag> getFileTags(String name) {
 		synchronized (this) {
-			return ImmutableSet.copyOf(nameCache.keySet());
+			return ImmutableSet.copyOf(tagNameCache.get(name));
 		}
 	}
 
 	@Override
-	public Set<IMediaFileTag> getTags(String name) {
-		synchronized (this) {
-			return ImmutableSet.copyOf(nameCache.get(name));
-		}
+	public Set<IMediaFileTag> getFileTags(ITag tag) {
+		return getFileTags(tag.getName());
 	}
 
 	@Override
@@ -101,19 +101,46 @@ public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> 
 	}
 
 	@Override
-	public Set<String> getTagNames(int id) {
+	public void remove(int fileId, String tagName) {
+		synchronized (this) {
+			Set<IMediaFileTag> tags = fileIdCache.get(fileId);
+			for (IMediaFileTag tag : tags) {
+				if (tag.getTag().getName().equals(tagName)) {
+					remove(tag);
+					return;
+				}
+			}
+		}
+	}
+
+	@Override
+	public void add(int fileId, String tagName) {
+		synchronized (this) {
+
+			// Only add if does not already exist
+			Set<IMediaFileTag> tags = fileIdCache.get(fileId);
+			for (IMediaFileTag tag : tags) {
+				if (tag.getTag().getName().equals(tagName)) {
+					return;
+				}
+			}
+
+			ITag tag = tagCache.getTag(tagName);
+			add(new MediaFileTag(fileId, tag));
+		}
+	}
+
+	@Override
+	public Set<ITag> getTags(int fileId) {
 		Set<IMediaFileTag> tags;
 		synchronized (this) {
-			tags = idCache.get(id);
+			tags = fileIdCache.get(fileId);
 		}
-		if (tags.isEmpty()) {
-			return Collections.emptySet();
-		}
-		Set<String> names = new TreeSet<>();
+		Set<ITag> set = new TreeSet<>();
 		for (IMediaFileTag tag : tags) {
-			names.add(tag.getName());
+			set.add(tag.getTag());
 		}
-		return names;
+		return set;
 	}
 
 	@Override
@@ -127,18 +154,19 @@ public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> 
 			return null;
 		}
 
-		int id = Integer.parseInt(elements.get(0));
+		int fileId = Integer.parseInt(elements.get(0));
 		String name = elements.get(1);
-		return new MediaFileTag(id, name);
+		ITag tag = tagCache.getTag(name);
+		return new MediaFileTag(fileId, tag);
 	}
 
 	@Override
-	public String formatToLine(IMediaFileTag element) {
-		return element.getId() + "," + element.getName();
+	public String formatToLine(IMediaFileTag tag) {
+		return tag.getFileId() + "," + tag.getTag().getName();
 	}
 
 	@Override
-	public void removeAll(int id) {
+	public void removeAll(int fileId) {
 		synchronized (this) {
 			Set<IMediaFileTag> set = new LinkedHashSet<>(getAll());
 			boolean modified = false;
@@ -146,8 +174,8 @@ public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> 
 			Iterator<IMediaFileTag> iterator = set.iterator();
 			while (iterator.hasNext()) {
 				IMediaFileTag tag = iterator.next();
-				if (tag.getId() == id) {
-					log.info("[Remove] id={}, name={}", tag.getId(), tag.getName());
+				if (tag.getFileId() == fileId) {
+					log.info("[Remove] id={}, name={}", tag.getFileId(), tag.getTag().getName());
 					iterator.remove();
 					modified = true;
 				}

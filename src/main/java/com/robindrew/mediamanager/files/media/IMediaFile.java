@@ -1,6 +1,9 @@
 package com.robindrew.mediamanager.files.media;
 
+import java.io.File;
 import java.util.Set;
+
+import com.robindrew.mediamanager.files.media.tag.ITag;
 
 public interface IMediaFile {
 
@@ -16,6 +19,8 @@ public interface IMediaFile {
 
 	MediaFileType getType();
 
-	Set<String> getTags();
+	Set<ITag> getTags();
+
+	IMediaFrame getFrame(File file, double timestamp);
 
 }

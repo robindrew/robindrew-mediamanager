@@ -17,6 +17,7 @@ import com.robindrew.common.template.ITemplateLocator;
 import com.robindrew.common.template.velocity.VelocityTemplateLocatorSupplier;
 import com.robindrew.mediamanager.jetty.executor.ViewPhotoExecutor;
 import com.robindrew.mediamanager.jetty.executor.ViewVideoExecutor;
+import com.robindrew.mediamanager.jetty.executor.ViewVideoFrameExecutor;
 import com.robindrew.mediamanager.jetty.page.PhotoCollectionPage;
 import com.robindrew.mediamanager.jetty.page.PhotoTagPage;
 import com.robindrew.mediamanager.jetty.page.PhotosPage;
@@ -53,6 +54,7 @@ public class JettyComponent extends JettyVelocityComponent {
 		handler.uri("/Videos/Tag", new VideoTagPage(getContext(), "site/media/videos/Tag.html"));
 		handler.uri("/Videos/Collection", new VideoCollectionPage(getContext(), "site/media/videos/Collection.html"));
 		handler.uri("/Videos/ViewVideo", new ViewVideoExecutor());
+		handler.uri("/Videos/ViewVideoFrame", new ViewVideoFrameExecutor());
 	}
 
 	private IHttpExecutor newIndexPage(IVelocityHttpContext context, String templateName) {

@@ -1,33 +1,33 @@
-package com.robindrew.mediamanager.files.media.tag;
+package com.robindrew.mediamanager.files.media.tag.file;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import com.robindrew.common.text.Strings;
-import com.robindrew.common.util.Check;
+import com.robindrew.mediamanager.files.media.tag.ITag;
 
 public class MediaFileTag implements IMediaFileTag {
 
-	private final int id;
-	private final String name;
+	private final int fileId;
+	private final ITag tag;
 
-	public MediaFileTag(int id, String name) {
-		this.id = id;
-		this.name = Check.notEmpty("name", name);
+	public MediaFileTag(int fileId, ITag tag) {
+		this.fileId = fileId;
+		this.tag = tag;
 	}
 
 	@Override
-	public int getId() {
-		return id;
+	public int getFileId() {
+		return fileId;
 	}
 
 	@Override
-	public String getName() {
-		return name;
+	public ITag getTag() {
+		return tag;
 	}
 
 	@Override
 	public int hashCode() {
-		return name.hashCode() * id;
+		return tag.hashCode() * fileId;
 	}
 
 	@Override
@@ -37,10 +37,10 @@ public class MediaFileTag implements IMediaFileTag {
 		}
 		if (object instanceof IMediaFileTag) {
 			IMediaFileTag that = (IMediaFileTag) object;
-			if (this.getId() != that.getId()) {
+			if (this.getFileId() != that.getFileId()) {
 				return false;
 			}
-			return this.getName().equals(that.getName());
+			return this.getTag().equals(that.getTag());
 		}
 		return false;
 	}
@@ -53,8 +53,8 @@ public class MediaFileTag implements IMediaFileTag {
 	@Override
 	public int compareTo(IMediaFileTag that) {
 		CompareToBuilder compare = new CompareToBuilder();
-		compare.append(this.getId(), that.getId());
-		compare.append(this.getName(), that.getName());
+		compare.append(this.getFileId(), that.getFileId());
+		compare.append(this.getTag(), that.getTag());
 		return compare.toComparison();
 	}
 

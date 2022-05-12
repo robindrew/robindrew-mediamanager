@@ -6,8 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Splitter;
-import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
-import com.robindrew.mediamanager.files.media.tag.MediaFileTag;
+import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
 
 public class ModifyTagAction {
 
@@ -15,11 +14,11 @@ public class ModifyTagAction {
 
 	private static final Splitter splitter = Splitter.on(',').omitEmptyStrings().trimResults();
 
-	public void execute(String tags, int tagId) {
+	public void execute(String tags, int fileId) {
 		if (tags == null || tags.trim().isEmpty()) {
 			return;
 		}
-		if (tagId < 0) {
+		if (fileId < 0) {
 			return;
 		}
 		tags = tags.trim();
@@ -28,8 +27,8 @@ public class ModifyTagAction {
 		IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
 		if (tags.equals("--")) {
 
-			log.info("[Remove All Tags] #{}", tagId);
-			cache.removeAll(tagId);
+			log.info("[Remove All Tags] #{}", fileId);
+			cache.removeAll(fileId);
 			return;
 		}
 
@@ -40,8 +39,8 @@ public class ModifyTagAction {
 			if (tag.startsWith("-")) {
 				tag = tag.substring(1);
 
-				log.info("[Remove Tag] #{} -> '{}'", tagId, tags);
-				cache.remove(new MediaFileTag(tagId, tag));
+				log.info("[Remove Tag] #{} -> '{}'", fileId, tags);
+				cache.remove(fileId, tag);
 			}
 			
 			// Add Tag
@@ -51,8 +50,8 @@ public class ModifyTagAction {
 					tag = tag.substring(1);
 				}
 
-				log.info("[Add Tag] #{} -> '{}'", tagId, tags);
-				cache.add(new MediaFileTag(tagId, tag));
+				log.info("[Add Tag] #{} -> '{}'", fileId, tag);
+				cache.add(fileId, tag);
 			}
 		}
 	}

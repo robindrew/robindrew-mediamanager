@@ -34,8 +34,8 @@ a:link, a:visited a:link:active, a:visited:active {
 </div>
 <ul class="nav navbar-nav">
 <li><a href="/Videos">Videos</a></li>
-<li><a href="/Videos/Tag?name=${name}">${name}</a></li>
-<li class="active"><a href="/Videos/Tag?name=${name}&number=${currentPage}">Page ${currentPage}</a></li>
+<li><a href="/Videos/Tag?tagNumber=${tag.number}">${tag.name}</a></li>
+<li class="active"><a href="/Videos/Tag?tagNumber=${tag.number}&number=${currentPage}">Page ${currentPage}</a></li>
 </ul>
 </div><!-- /.container-fluid -->
 </nav>
@@ -47,16 +47,16 @@ a:link, a:visited a:link:active, a:visited:active {
 
 <!-- TITLE -->
 <div class="col-md-12">
-<h3><span class="glyphicon glyphicon-picture" aria-hidden="true"></span> Video Tag <span class="label label-primary">${name}</span></h3>
+<h3><span class="glyphicon glyphicon-picture" aria-hidden="true"></span> Video Tag <span class="label label-primary">${tag.name}</span></h3>
 <hr/>
 </div>
 
 #if($pageCount > 1)
 <div class="col-md-12">
 <ul class="pager">
-  <li class="previous #if($previousPage == 0) disabled #end"><a href="#if($previousPage == 0)# #else /Videos/Tag?name=${name}&number=${previousPage} #end">Previous</a></li>
+  <li class="previous #if($previousPage == 0) disabled #end"><a href="#if($previousPage == 0)# #else /Videos/Tag?tagNumber=${tag.number}&number=${previousPage} #end">Previous</a></li>
   <li><form><input type="hidden" name="name" value="${collection.name}"/><input type="text" size="2" name="number" value="${currentPage}"/></form> / ${pageCount}</li>
-  <li class="next #if($nextPage == 0) disabled #end"><a href="#if($nextPage == 0)# #else /Videos/Tag?name=${name}&number=${nextPage} #end">Next</a></li>
+  <li class="next #if($nextPage == 0) disabled #end"><a href="#if($nextPage == 0)# #else /Videos/Tag?tagNumber=${tag.number}&number=${nextPage} #end">Next</a></li>
 </ul>
 </div>
 #end
@@ -73,8 +73,8 @@ a:link, a:visited a:link:active, a:visited:active {
 #if($file.file.tags.size() > 0)
 <p>
 <a href="/Videos/Collection?name=${file.file.id}&type=id"><span class="label label-primary">:</span></a>
-#foreach($tag in $file.file.tags)
-<a href="/Videos/Tag?name=${tag}"><span class="label label-primary">${tag}</span></a>
+#foreach($fileTag in $file.file.tags)
+<a href="/Videos/Tag?tagNumber=${fileTag.number}"><span class="label label-primary">${fileTag}</span></a>
 #end
 </p>
 #end
@@ -95,9 +95,9 @@ a:link, a:visited a:link:active, a:visited:active {
 #if($pageCount > 1)
 <div class="col-md-12">
 <ul class="pager">
-  <li class="previous #if($previousPage == 0) disabled #end"><a href="#if($previousPage == 0)# #else /Videos/Tag?name=${name}&number=${previousPage} #end">Previous</a></li>
+  <li class="previous #if($previousPage == 0) disabled #end"><a href="#if($previousPage == 0)# #else /Videos/Tag?tagNumber=${tag.number}&number=${previousPage} #end">Previous</a></li>
   <li>${currentPage} / ${pageCount}</li>
-  <li class="next #if($nextPage == 0) disabled #end"><a href="#if($nextPage == 0)# #else /Videos/Tag?name=${name}&number=${nextPage} #end">Next</a></li>
+  <li class="next #if($nextPage == 0) disabled #end"><a href="#if($nextPage == 0)# #else /Videos/Tag?tagNumber=${tag.number}&number=${nextPage} #end">Next</a></li>
 </ul>
 <hr/>
 </div>

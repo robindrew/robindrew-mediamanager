@@ -74,8 +74,8 @@ ${collection.name}
 <div class="caption">
 <p>
 <div style="width:320px; min-height:20px;">
-#foreach($tag in $file.tags)
-<a href="/Photos/Tag?name=${tag}"><span class="label label-primary">$tag</span></a>
+#foreach($fileTag in $file.tags)
+<a href="/Photos/Tag?tagNumber=${fileTag.number}"><span class="label label-primary">$fileTag</span></a>
 #end
 </div>
 </p>

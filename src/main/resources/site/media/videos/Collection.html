@@ -69,16 +69,14 @@ ${collection.name}
 <div class="thumbnail">
 <div style="width:320px; height:240px;">
 <a href="/Videos/ViewVideo?id=${file.id}" target="_video${file.id}">
-<video width="320">
-  <source src="/Videos/ViewVideo?id=${file.id}" type="video/mp4">
-</video>
+<img src="/Videos/ViewVideoFrame?id=${file.id}&s=5"/>
 </a>
 </div>
 <div class="caption">
 <p>
 <div style="width:320px; height:15px;">
-#foreach($tag in $file.tags)
-<a href="/Videos/Tag?name=${tag}"><span class="label label-primary">$tag</span></a>
+#foreach($fileTag in $file.tags)
+<a href="/Videos/Tag?tagNumber=${fileTag.number}"><span class="label label-primary">$tag</span></a>
 #end
 </div>
 </p>

@@ -7,14 +7,14 @@ import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.MediaFileType;
 import com.robindrew.mediamanager.files.media.MediaType;
-import com.robindrew.mediamanager.files.media.tag.IMediaFileTag;
+import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTag;
 
 public class MediaFileTagView {
 
 	public static Set<MediaFileTagView> from(IFileManager manager, Set<IMediaFileTag> tags, MediaType type) {
 		Set<MediaFileTagView> set = new LinkedHashSet<>();
 		for (IMediaFileTag tag : tags) {
-			IMediaFile file = manager.getMediaFile(tag.getId());
+			IMediaFile file = manager.getMediaFile(tag.getFileId());
 			if (file.getType().getType().equals(type)) {
 				set.add(new MediaFileTagView(tag, file));
 			}
@@ -31,11 +31,11 @@ public class MediaFileTagView {
 	}
 
 	public int getId() {
-		return tag.getId();
+		return tag.getFileId();
 	}
 
 	public String getName() {
-		return tag.getName();
+		return tag.getTag().getName();
 	}
 
 	public MediaFileType getType() {

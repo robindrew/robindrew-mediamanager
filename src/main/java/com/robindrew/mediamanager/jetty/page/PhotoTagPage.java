@@ -15,8 +15,10 @@ import com.robindrew.common.http.servlet.response.IHttpResponse;
 import com.robindrew.common.properties.map.type.IntegerProperty;
 import com.robindrew.common.service.component.jetty.handler.page.AbstractServicePage;
 import com.robindrew.mediamanager.files.manager.IFileManager;
-import com.robindrew.mediamanager.files.media.tag.IMediaFileTag;
-import com.robindrew.mediamanager.files.media.tag.IMediaFileTagCache;
+import com.robindrew.mediamanager.files.media.tag.ITag;
+import com.robindrew.mediamanager.files.media.tag.ITagCache;
+import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTag;
+import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
 import com.robindrew.mediamanager.jetty.page.action.ModifyTagAction;
 import com.robindrew.mediamanager.jetty.page.view.MediaFileTagView;
 
@@ -32,7 +34,7 @@ public class PhotoTagPage extends AbstractServicePage {
 	protected void execute(IHttpRequest request, IHttpResponse response, Map<String, Object> dataMap) {
 		super.execute(request, response, dataMap);
 
-		String name = request.getString("name");
+		int tagNumber = request.getInteger("tagNumber");
 		int pageNumber = request.getInteger("number", 1);
 		int pageSize = request.getInteger("size", defaultPhotosPerPage.get());
 		int tagId = request.getInteger("tagId", -1);
@@ -40,18 +42,21 @@ public class PhotoTagPage extends AbstractServicePage {
 
 		new ModifyTagAction().execute(tags, tagId);
 
+		ITagCache tagCache = getDependency(ITagCache.class);
+		ITag tag = tagCache.getTag(tagNumber);
+
 		IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
-		Set<IMediaFileTag> tagSet = cache.getTags(name);
+		Set<IMediaFileTag> fileTags = cache.getFileTags(tag);
 
 		IFileManager manager = getDependency(IFileManager.class);
-		Set<MediaFileTagView> views = MediaFileTagView.from(manager, tagSet, PHOTO);
+		Set<MediaFileTagView> views = MediaFileTagView.from(manager, fileTags, PHOTO);
 
 		IPaginator<MediaFileTagView> paginator = new Paginator<>(views);
 		List<MediaFileTagView> page = paginator.getPage(pageNumber, pageSize);
 		List<MediaFileTagView> next = paginator.getPage(pageNumber + 1, pageSize);
 		int pageCount = paginator.getPageCount(pageSize);
 
-		dataMap.put("name", name);
+		dataMap.put("tag", tag);
 		dataMap.put("tags", views);
 		dataMap.put("page", page);
 		dataMap.put("pageSize", pageSize);
