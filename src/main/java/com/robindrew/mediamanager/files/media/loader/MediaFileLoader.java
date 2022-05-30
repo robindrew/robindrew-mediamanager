@@ -172,7 +172,7 @@ public class MediaFileLoader implements IMediaFileLoader {
 				Stopwatch timer = Stopwatch.createStarted();
 				image = getImageData(context);
 				timer.stop();
-				log.debug("Image {} loaded in {}", context.getFile().getPath(), timer);
+				log.debug("Image from '{}' loaded in {}", context.getFile().getPath(), timer);
 			}
 
 			reference = new SoftReference<>(image);
