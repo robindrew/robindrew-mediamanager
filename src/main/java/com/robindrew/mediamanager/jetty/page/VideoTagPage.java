@@ -44,7 +44,7 @@ public class VideoTagPage extends AbstractServicePage {
 
 		ITagCache tagCache = getDependency(ITagCache.class);
 		ITag tag = tagCache.getTag(tagNumber);
-		
+
 		IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
 		Set<IMediaFileTag> fileTags = cache.getFileTags(tag);
 

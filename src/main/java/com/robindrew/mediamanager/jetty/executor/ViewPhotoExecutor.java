@@ -11,6 +11,7 @@ import com.robindrew.common.http.servlet.response.IHttpResponse;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.loader.IMediaFileLoader;
+import com.robindrew.mediamanager.files.media.loader.LoaderContext;
 
 public class ViewPhotoExecutor implements IHttpExecutor {
 
@@ -31,7 +32,7 @@ public class ViewPhotoExecutor implements IHttpExecutor {
 		IMediaFile mediaFile = manager.getMediaFile(id);
 
 		IMediaFileLoader loader = getDependency(IMediaFileLoader.class);
-		byte[] image = loader.getImage(mediaFile, width, height, fit);
+		byte[] image = loader.getImage(new LoaderContext(mediaFile, width, height).setFit(fit));
 
 		MimeType type = MimeType.withName(mediaFile.getName());
 		response.ok(new ContentType(type), ByteSource.wrap(image));

@@ -27,6 +27,7 @@ import com.robindrew.mediamanager.files.media.IMediaFileCache;
 import com.robindrew.mediamanager.files.media.MediaFileCacheFile;
 import com.robindrew.mediamanager.files.media.MediaType;
 import com.robindrew.mediamanager.files.media.loader.IMediaFileLoader;
+import com.robindrew.mediamanager.files.media.loader.LoaderContext;
 import com.robindrew.mediamanager.files.media.loader.MediaFileLoader;
 import com.robindrew.mediamanager.files.media.tag.ITagCache;
 import com.robindrew.mediamanager.files.media.tag.TagCacheFile;
@@ -94,7 +95,7 @@ public class MediaFileComponent extends AbstractIdleComponent implements MediaFi
 
 					@Override
 					public void run() {
-						loader.getImage(file, 320, 240, true);
+						loader.getImage(new LoaderContext(file, 320, 240));
 					}
 				});
 			}

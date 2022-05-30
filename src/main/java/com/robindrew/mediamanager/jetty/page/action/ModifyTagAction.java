@@ -34,7 +34,7 @@ public class ModifyTagAction {
 
 		// Add/Remove Tags
 		for (String tag : splitter.split(tags)) {
-			
+
 			// Remove Tag
 			if (tag.startsWith("-")) {
 				tag = tag.substring(1);
@@ -42,7 +42,7 @@ public class ModifyTagAction {
 				log.info("[Remove Tag] #{} -> '{}'", fileId, tags);
 				cache.remove(fileId, tag);
 			}
-			
+
 			// Add Tag
 			else {
 				// The + is optional

@@ -32,6 +32,7 @@ import com.robindrew.common.util.Check;
 import com.robindrew.common.util.Java;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
+import com.robindrew.mediamanager.files.media.frame.MediaFrame;
 
 public class MediaFileLoader implements IMediaFileLoader {
 
@@ -51,7 +52,7 @@ public class MediaFileLoader implements IMediaFileLoader {
 		output.writeToFile(toFile);
 	}
 
-	final public static BufferedImage convertColorspace(BufferedImage image, int newType) {
+	public static final BufferedImage convertColorspace(BufferedImage image, int newType) {
 		BufferedImage raw_image = image;
 		image = new BufferedImage(raw_image.getWidth(), raw_image.getHeight(), newType);
 		ColorConvertOp xformOp = new ColorConvertOp(null);
@@ -59,7 +60,7 @@ public class MediaFileLoader implements IMediaFileLoader {
 		return image;
 	}
 
-	final static BufferedImage resize(BufferedImage image, int width, int height) {
+	public static final BufferedImage resize(BufferedImage image, int width, int height) {
 
 		int oldWidth = image.getWidth();
 		int oldHeight = image.getHeight();
@@ -98,10 +99,8 @@ public class MediaFileLoader implements IMediaFileLoader {
 		this.cacheDirectory = Check.existsDirectory("cacheDirectory", cacheDirectory);
 	}
 
-	public byte[] readImageFromFile(IMediaFile mediaFile) {
+	public byte[] readImageFromFile(IMediaFile mediaFile, File file) {
 		try {
-			File file = new File(manager.getRootDirectory(), mediaFile.getSourcePath());
-
 			if (mediaFile.isArchived()) {
 				try (ZipFile zip = new ZipFile(file)) {
 					ZipEntry entry = zip.getEntry(mediaFile.getName());
@@ -118,30 +117,36 @@ public class MediaFileLoader implements IMediaFileLoader {
 		}
 	}
 
-	public byte[] getImageData(IMediaFile mediaFile, int width, int height, boolean fit) {
+	public byte[] getImageData(LoaderContext context) {
 		try {
-			byte[] imageData = readImageFromFile(mediaFile);
 
-			if (width == 0 && height == 0) {
-				return imageData;
+			final IMediaFile mediaFile = context.getFile();
+			final File file = new File(manager.getRootDirectory(), mediaFile.getSourcePath());
+			final BufferedImage image;
+
+			// Photo
+			if (mediaFile.getType().isPhoto()) {
+				byte[] imageData = readImageFromFile(mediaFile, file);
+				if (context.getWidth() == 0 && context.getHeight() == 0) {
+					return imageData;
+				}
+				image = Images.toBufferedImage(imageData);
+			} else {
+				image = new MediaFrame(file, context.getFrameSeconds()).toBufferedImage();
 			}
 
-			BufferedImage image = Images.toBufferedImage(imageData);
-
-			IImageOutput output = resizeImage(image, width, height, fit);
-			return output.writeToByteArray();
-			//
-			// ByteArrayInputStream input = new ByteArrayInputStream(bytes);
-			// ByteArrayOutputStream output = new ByteArrayOutputStream();
-			// Thumbnailator.createThumbnail(input, output, width, height);
-			// return output.toByteArray();
+			return resizeImage(image, context).writeToByteArray();
 
 		} catch (Exception e) {
 			throw Java.propagate(e);
 		}
 	}
 
-	protected IImageOutput resizeImage(BufferedImage image, int width, int height, boolean fit) throws IOException {
+	private static final IImageOutput resizeImage(BufferedImage image, LoaderContext context) throws IOException {
+		int width = context.getWidth();
+		int height = context.getHeight();
+		boolean fit = context.isFit();
+
 		if (width > 0 && height > 0) {
 			if (fit) {
 				image = Images.scaleImageToFit(image, width, height, Color.WHITE);
@@ -153,9 +158,9 @@ public class MediaFileLoader implements IMediaFileLoader {
 	}
 
 	@Override
-	public byte[] getImage(IMediaFile mediaFile, int width, int height, boolean fit) {
+	public byte[] getImage(LoaderContext context) {
 
-		ImageKey key = new ImageKey(mediaFile.getId(), width, height);
+		ImageKey key = context.toKey();
 		Reference<byte[]> reference = imageCache.get(key);
 		byte[] image = reference == null ? null : reference.get();
 		if (image == null) {
@@ -165,9 +170,9 @@ public class MediaFileLoader implements IMediaFileLoader {
 
 			if (image == null) {
 				Stopwatch timer = Stopwatch.createStarted();
-				image = getImageData(mediaFile, width, height, fit);
+				image = getImageData(context);
 				timer.stop();
-				log.debug("Image {} loaded in {}", mediaFile.getPath(), timer);
+				log.debug("Image {} loaded in {}", context.getFile().getPath(), timer);
 			}
 
 			reference = new SoftReference<>(image);

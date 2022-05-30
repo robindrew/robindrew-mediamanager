@@ -1,4 +1,4 @@
-package com.robindrew.mediamanager.files.media;
+package com.robindrew.mediamanager.files.media.frame;
 
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;

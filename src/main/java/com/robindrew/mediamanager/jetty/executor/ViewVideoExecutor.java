@@ -3,10 +3,7 @@ package com.robindrew.mediamanager.jetty.executor;
 import static com.robindrew.common.dependency.DependencyFactory.getDependency;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.Map.Entry;
 
-import com.google.common.base.Stopwatch;
 import com.google.common.io.ByteSource;
 import com.robindrew.common.http.ContentType;
 import com.robindrew.common.http.MimeType;

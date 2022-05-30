@@ -30,6 +30,14 @@ public enum MediaFileType {
 		this.type = type;
 	}
 
+	public boolean isVideo() {
+		return type.equals(VIDEO);
+	}
+
+	public boolean isPhoto() {
+		return type.equals(PHOTO);
+	}
+
 	public MediaType getType() {
 		return type;
 	}
