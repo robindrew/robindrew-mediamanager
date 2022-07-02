@@ -81,7 +81,7 @@ public class MediaConverter implements AutoCloseable {
 		Process process = builder.start();
 		service.submit(() -> print("Input", process.getInputStream()));
 		service.submit(() -> print("Error", process.getErrorStream()));
-		System.out.println(process.waitFor());
+		log.info("[Complete] {}", process.waitFor());
 		service.shutdown();
 	}
 
