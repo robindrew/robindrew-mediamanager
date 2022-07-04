@@ -1,20 +1,26 @@
 package com.robindrew.mediamanager.jetty.executor;
 
-import static com.robindrew.common.dependency.DependencyFactory.getDependency;
+import javax.servlet.annotation.WebServlet;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.io.ByteSource;
-import com.robindrew.common.dependency.DependencyFactory;
-import com.robindrew.common.http.ContentType;
 import com.robindrew.common.http.MimeType;
-import com.robindrew.common.http.servlet.executor.IHttpExecutor;
+import com.robindrew.common.http.response.IHttpResponse;
+import com.robindrew.common.http.servlet.AbstractBaseServlet;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
-import com.robindrew.common.http.servlet.response.IHttpResponse;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.loader.IMediaFileLoader;
 import com.robindrew.mediamanager.files.media.loader.LoaderContext;
 
-public class ViewVideoFrameExecutor implements IHttpExecutor {
+@WebServlet(urlPatterns = "/Videos/ViewVideoFrame")
+public class ViewVideoFrameExecutor extends AbstractBaseServlet {
+
+	@Autowired
+	private IFileManager fileManager;
+	@Autowired
+	private IMediaFileLoader loader;
 
 	@Override
 	public void execute(IHttpRequest request, IHttpResponse response) {
@@ -25,14 +31,12 @@ public class ViewVideoFrameExecutor implements IHttpExecutor {
 		int seconds = request.getInteger("s", 5);
 		boolean fit = request.getBoolean("fit", true);
 
-		IFileManager manager = getDependency(IFileManager.class);
-		IMediaFile mediaFile = manager.getMediaFile(id);
+		IMediaFile mediaFile = fileManager.getMediaFile(id);
 
-		IMediaFileLoader loader = DependencyFactory.getDependency(IMediaFileLoader.class);
 		byte[] image = loader.getImage(new LoaderContext(mediaFile, width, height).setFit(fit).setFrameSeconds(seconds));
 
 		response.addHeader("Cache-Control", "public, max-age=604800");
-		response.ok(new ContentType(MimeType.IMAGE_JPEG), ByteSource.wrap(image));
+		response.ok(MimeType.IMAGE_JPEG, ByteSource.wrap(image));
 	}
 
 }

@@ -103,10 +103,6 @@ public class MediaFileComponent extends AbstractIdleComponent implements MediaFi
 	}
 
 	@Override
-	protected void shutdownComponent() throws Exception {
-	}
-
-	@Override
 	public String getRootDirectory() {
 		return getManager().getRootDirectory().getAbsolutePath();
 	}

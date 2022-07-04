@@ -1,19 +1,26 @@
 package com.robindrew.mediamanager.jetty.executor;
 
-import static com.robindrew.common.dependency.DependencyFactory.getDependency;
+import javax.servlet.annotation.WebServlet;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.common.io.ByteSource;
-import com.robindrew.common.http.ContentType;
 import com.robindrew.common.http.MimeType;
-import com.robindrew.common.http.servlet.executor.IHttpExecutor;
+import com.robindrew.common.http.response.IHttpResponse;
+import com.robindrew.common.http.servlet.AbstractBaseServlet;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
-import com.robindrew.common.http.servlet.response.IHttpResponse;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.loader.IMediaFileLoader;
 import com.robindrew.mediamanager.files.media.loader.LoaderContext;
 
-public class ViewPhotoExecutor implements IHttpExecutor {
+@WebServlet(urlPatterns = "/Photos/ViewPhoto")
+public class ViewPhotoExecutor extends AbstractBaseServlet {
+
+	@Autowired
+	private IFileManager fileManager;
+	@Autowired
+	private IMediaFileLoader loader;
 
 	@Override
 	public void execute(IHttpRequest request, IHttpResponse response) {
@@ -28,14 +35,12 @@ public class ViewPhotoExecutor implements IHttpExecutor {
 			height = 0;
 		}
 
-		IFileManager manager = getDependency(IFileManager.class);
-		IMediaFile mediaFile = manager.getMediaFile(id);
+		IMediaFile mediaFile = fileManager.getMediaFile(id);
 
-		IMediaFileLoader loader = getDependency(IMediaFileLoader.class);
 		byte[] image = loader.getImage(new LoaderContext(mediaFile, width, height).setFit(fit));
 
-		MimeType type = MimeType.withName(mediaFile.getName());
-		response.ok(new ContentType(type), ByteSource.wrap(image));
+		String type = MimeType.forExtension(mediaFile.getName());
+		response.ok(type, ByteSource.wrap(image));
 	}
 
 }
