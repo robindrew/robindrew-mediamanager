@@ -9,7 +9,7 @@ import com.robindrew.common.http.MimeType;
 import com.robindrew.common.http.response.IHttpResponse;
 import com.robindrew.common.http.servlet.executor.IHttpExecutor;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
-import com.robindrew.common.io.Files;
+import com.robindrew.common.io.file.Files;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 

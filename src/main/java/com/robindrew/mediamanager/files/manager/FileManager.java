@@ -15,9 +15,9 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
-import com.robindrew.common.io.Files;
-import com.robindrew.common.util.Check;
-import com.robindrew.common.util.Threads;
+import com.robindrew.common.base.Preconditions;
+import com.robindrew.common.base.Threads;
+import com.robindrew.common.io.file.Files;
 import com.robindrew.mediamanager.files.archive.FileArchive;
 import com.robindrew.mediamanager.files.archive.IArchivedFile;
 import com.robindrew.mediamanager.files.archive.IFileArchive;
@@ -35,7 +35,7 @@ public class FileManager implements IFileManager {
 	private final List<File> files = new ArrayList<>();
 
 	public FileManager(File rootDirectory, IMediaFileCache cache) {
-		this.rootDirectory = Check.existsDirectory("rootDirectory", rootDirectory);
+		this.rootDirectory = Preconditions.existsDirectory("rootDirectory", rootDirectory);
 		this.rootDirectoryPath = rootDirectory.getAbsolutePath();
 		this.cache = cache;
 	}

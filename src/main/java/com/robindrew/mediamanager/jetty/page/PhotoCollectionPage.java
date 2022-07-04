@@ -1,20 +1,23 @@
 package com.robindrew.mediamanager.jetty.page;
 
-import static com.robindrew.common.dependency.DependencyFactory.getDependency;
 import static com.robindrew.mediamanager.files.media.MediaType.PHOTO;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.annotation.WebServlet;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
 import com.google.common.base.Splitter;
 import com.robindrew.common.collect.IPaginator;
 import com.robindrew.common.collect.Paginator;
-import com.robindrew.common.http.servlet.executor.IVelocityHttpContext;
+import com.robindrew.common.http.response.IHttpResponse;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
-import com.robindrew.common.http.servlet.response.IHttpResponse;
-import com.robindrew.common.properties.map.type.IntegerProperty;
-import com.robindrew.common.service.component.jetty.handler.page.AbstractServicePage;
+import com.robindrew.common.http.servlet.template.AbstractTemplateServlet;
+import com.robindrew.common.http.servlet.template.TemplateResource;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.IMediaFileCollection;
@@ -26,11 +29,13 @@ import com.robindrew.mediamanager.jetty.page.action.ModifyTagAction;
 @TemplateResource("site/media/photos/Collection.html")
 public class PhotoCollectionPage extends AbstractTemplateServlet {
 
-	private static final IntegerProperty defaultPhotosPerPage = new IntegerProperty("photos.per.page").defaultValue(6);
+	@Value("${photos.per.page}")
+	private int defaultPhotosPerPage = 6;
 
-	public PhotoCollectionPage(IVelocityHttpContext context, String templateName) {
-		super(context, templateName);
-	}
+	@Autowired
+	private IFileManager fileManager;
+	@Autowired
+	private IMediaFileTagCache fileTagCache;
 
 	@Override
 	protected void execute(IHttpRequest request, IHttpResponse response, Map<String, Object> dataMap) {
@@ -39,15 +44,14 @@ public class PhotoCollectionPage extends AbstractTemplateServlet {
 		String name = request.getString("name");
 		String type = request.getString("type", "name");
 		int pageNumber = request.getInteger("number", 1);
-		int pageSize = request.getInteger("size", defaultPhotosPerPage.get());
+		int pageSize = request.getInteger("size", defaultPhotosPerPage);
 		String tags = request.getString("tag", null);
 		int tagId = request.getInteger("tagId", -1);
 		String allTags = request.getString("allTags", null);
 
-		new ModifyTagAction().execute(tags, tagId);
+		new ModifyTagAction(fileTagCache).execute(tags, tagId);
 
-		IFileManager manager = getDependency(IFileManager.class);
-		Set<IMediaFile> files = manager.getMediaFiles();
+		Set<IMediaFile> files = fileManager.getMediaFiles();
 		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(PHOTO, files);
 
 		int index = indexOf(collections, name, type);
@@ -59,10 +63,9 @@ public class PhotoCollectionPage extends AbstractTemplateServlet {
 
 		// Tag All command
 		if (allTags != null) {
-			IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
 			for (String tagName : Splitter.on(',').omitEmptyStrings().trimResults().split(allTags)) {
 				for (IMediaFile file : files) {
-					cache.add(file.getId(), tagName);
+					fileTagCache.add(file.getId(), tagName);
 				}
 			}
 		}
@@ -72,7 +75,7 @@ public class PhotoCollectionPage extends AbstractTemplateServlet {
 		List<IMediaFile> next = paginator.getPage(pageNumber + 1, pageSize);
 		int pageCount = paginator.getPageCount(pageSize);
 
-		dataMap.put("root", manager.getRootDirectory());
+		dataMap.put("root", fileManager.getRootDirectory());
 		dataMap.put("collection", collection);
 		dataMap.put("page", page);
 		dataMap.put("pageSize", pageSize);

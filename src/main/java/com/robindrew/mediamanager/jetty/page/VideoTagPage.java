@@ -49,7 +49,7 @@ public class VideoTagPage extends AbstractTemplateServlet {
 		int tagId = request.getInteger("tagId", -1);
 		String tags = request.getString("tag", null);
 
-		new ModifyTagAction().execute(tags, tagId);
+		new ModifyTagAction(fileTagCache).execute(tags, tagId);
 
 		ITag tag = tagCache.getTag(tagNumber);
 		Set<IMediaFileTag> fileTags = fileTagCache.getFileTags(tag);

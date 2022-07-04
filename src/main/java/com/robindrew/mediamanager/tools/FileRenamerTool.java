@@ -5,9 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.apache.commons.lang.builder.CompareToBuilder;
-
-import com.robindrew.common.io.Files;
+import com.robindrew.common.io.file.Files;
 
 public class FileRenamerTool {
 
@@ -88,10 +86,11 @@ public class FileRenamerTool {
 	}
 
 	public int fileComparator(File file1, File file2) {
-		CompareToBuilder compare = new CompareToBuilder();
-		compare.append(file1.lastModified(), file2.lastModified());
-		compare.append(file1.getName(), file2.getName());
-		return compare.toComparison();
+		int compare = Long.compare(file1.lastModified(), file2.lastModified());
+		if (compare != 0) {
+			return compare;
+		}
+		return file1.getName().compareTo(file2.getName());
 	}
 
 	private void renameFile(File fromFile, int number) {

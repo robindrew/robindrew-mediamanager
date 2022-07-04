@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.LineProcessor;
-import com.robindrew.common.io.Files;
-import com.robindrew.common.util.Check;
+import com.robindrew.common.base.Preconditions;
+import com.robindrew.common.io.file.Files;
 
 public class MediaFileCacheFile implements IMediaFileCache {
 
@@ -35,7 +35,7 @@ public class MediaFileCacheFile implements IMediaFileCache {
 	private final Set<String> sourcePathSet = new TreeSet<>();
 
 	public MediaFileCacheFile(File cacheFile) {
-		this.cacheFile = Check.notNull("cacheFile", cacheFile);
+		this.cacheFile = Preconditions.notNull("cacheFile", cacheFile);
 
 		readCacheFile();
 	}

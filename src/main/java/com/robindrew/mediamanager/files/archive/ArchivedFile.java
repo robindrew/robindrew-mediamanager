@@ -2,7 +2,7 @@ package com.robindrew.mediamanager.files.archive;
 
 import java.io.File;
 
-import com.robindrew.common.util.Check;
+import com.robindrew.common.base.Preconditions;
 
 public class ArchivedFile implements IArchivedFile {
 
@@ -10,8 +10,8 @@ public class ArchivedFile implements IArchivedFile {
 	private final String name;
 
 	public ArchivedFile(String name, File archive) {
-		this.name = Check.notEmpty("name", name);
-		this.archive = Check.existsFile("archive", archive);
+		this.name = Preconditions.notEmpty("name", name);
+		this.archive = Preconditions.existsFile("archive", archive);
 	}
 
 	public File getArchive() {

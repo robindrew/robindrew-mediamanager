@@ -13,7 +13,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
-import com.robindrew.common.io.Files;
+import com.robindrew.common.io.file.Files;
 
 public class TagCacheFile implements ITagCache {
 

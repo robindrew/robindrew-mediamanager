@@ -7,8 +7,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import com.google.common.io.ByteSource;
-import com.robindrew.common.io.Files;
-import com.robindrew.common.util.Java;
+import com.robindrew.common.base.Java;
+import com.robindrew.common.io.file.Files;
 
 public class ZipFileArchive extends FileArchive {
 

@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.robindrew.common.io.Files;
+import com.robindrew.common.io.file.Files;
 
 public class MediaConverter implements AutoCloseable {
 

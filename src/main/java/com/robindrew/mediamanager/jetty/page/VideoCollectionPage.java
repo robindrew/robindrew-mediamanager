@@ -31,7 +31,7 @@ public class VideoCollectionPage extends AbstractTemplateServlet {
 
 	@Value("${videos.per.page}")
 	private int defaultVideosPerPage = 10;
-	
+
 	@Autowired
 	private IFileManager fileManager;
 	@Autowired
@@ -49,7 +49,7 @@ public class VideoCollectionPage extends AbstractTemplateServlet {
 		int tagId = request.getInteger("tagId", -1);
 		String allTags = request.getString("allTags", null);
 
-		new ModifyTagAction().execute(tags, tagId);
+		new ModifyTagAction(fileTagCache).execute(tags, tagId);
 
 		Set<IMediaFile> files = fileManager.getMediaFiles();
 		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(VIDEO, files);

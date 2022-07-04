@@ -6,7 +6,7 @@ import static java.util.Optional.of;
 import java.io.File;
 import java.util.Optional;
 
-import com.robindrew.common.util.Check;
+import com.robindrew.common.base.Preconditions;
 
 public abstract class FileArchive implements IFileArchive {
 
@@ -21,7 +21,7 @@ public abstract class FileArchive implements IFileArchive {
 	private final File file;
 
 	protected FileArchive(File file) {
-		this.file = Check.existsFile("file", file);
+		this.file = Preconditions.existsFile("file", file);
 	}
 
 	public File getFile() {

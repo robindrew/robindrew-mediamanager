@@ -30,7 +30,7 @@ import com.robindrew.mediamanager.jetty.page.view.MediaFileTagView;
 public class PhotoTagPage extends AbstractTemplateServlet {
 
 	@Value("${photos.per.page}")
-	private int photosPerPage = 6;
+	private int defaultPhotosPerPage = 6;
 	
 	@Autowired
 	private ITagCache tagCache;
@@ -45,11 +45,11 @@ public class PhotoTagPage extends AbstractTemplateServlet {
 
 		int tagNumber = request.getInteger("tagNumber");
 		int pageNumber = request.getInteger("number", 1);
-		int pageSize = request.getInteger("size", photosPerPage);
+		int pageSize = request.getInteger("size", defaultPhotosPerPage);
 		int tagId = request.getInteger("tagId", -1);
 		String tags = request.getString("tag", null);
 
-		new ModifyTagAction().execute(tags, tagId);
+		new ModifyTagAction(fileTagCache).execute(tags, tagId);
 
 		ITag tag = tagCache.getTag(tagNumber);
 		Set<IMediaFileTag> fileTags = fileTagCache.getFileTags(tag);

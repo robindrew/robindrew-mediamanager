@@ -8,8 +8,8 @@ import java.util.Set;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.MultimapBuilder.SetMultimapBuilder;
 import com.google.common.collect.SetMultimap;
+import com.robindrew.common.base.Preconditions;
 import com.robindrew.common.text.Strings;
-import com.robindrew.common.util.Check;
 
 public class MediaFileCollection implements IMediaFileCollection {
 
@@ -45,7 +45,7 @@ public class MediaFileCollection implements IMediaFileCollection {
 	private final Set<IMediaFile> files;
 
 	public MediaFileCollection(String name, Collection<? extends IMediaFile> files) {
-		this.name = Check.notEmpty("name", name);
+		this.name = Preconditions.notEmpty("name", name);
 		this.files = ImmutableSet.copyOf(files);
 	}
 

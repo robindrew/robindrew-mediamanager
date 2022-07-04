@@ -1,48 +1,29 @@
 package com.robindrew.mediamanager;
 
-import com.robindrew.common.service.AbstractService;
-import com.robindrew.common.service.component.heartbeat.HeartbeatComponent;
-import com.robindrew.common.service.component.logging.LoggingComponent;
-import com.robindrew.common.service.component.properties.PropertiesComponent;
-import com.robindrew.common.service.component.stats.StatsComponent;
-import com.robindrew.mediamanager.files.MediaFileComponent;
-import com.robindrew.mediamanager.jetty.JettyComponent;
+import javax.annotation.PostConstruct;
 
-public class MediaManagerService extends AbstractService {
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-	/**
-	 * Entry point for the TurnEngine Admin Client Service.
-	 */
+import com.robindrew.common.web.Bootstrap;
+import com.robindrew.spring.AbstractSpringService;
+import com.robindrew.spring.servlet.index.IndexLinkMap;
+
+@SpringBootApplication
+public class MediaManagerService extends AbstractSpringService {
+
 	public static void main(String[] args) {
-		MediaManagerService service = new MediaManagerService(args);
-		service.startAsync();
+		SpringApplication.run(MediaManagerService.class, args);
 	}
 
-	private final JettyComponent jetty = new JettyComponent();
-	private final HeartbeatComponent heartbeat = new HeartbeatComponent();
-	private final PropertiesComponent properties = new PropertiesComponent();
-	private final LoggingComponent logging = new LoggingComponent();
-	private final MediaFileComponent file = new MediaFileComponent();
-	private final StatsComponent stats = new StatsComponent();
+	@Autowired
+	private IndexLinkMap linkMap;
 
-	public MediaManagerService(String[] args) {
-		super(args);
-	}
-
-	@Override
-	protected void startupService() throws Exception {
-		start(properties);
-		start(logging);
-		start(heartbeat);
-		start(stats);
-		start(file);
-		start(jetty);
-	}
-
-	@Override
-	protected void shutdownService() throws Exception {
-		stop(jetty);
-		stop(heartbeat);
+	@PostConstruct
+	public void registerLinks() {
+		linkMap.add("Photos", "/Photos", Bootstrap.COLOR_SUCCESS);
+		linkMap.add("Videos", "/Videos", Bootstrap.COLOR_DANGER);
 	}
 
 }

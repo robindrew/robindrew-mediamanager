@@ -1,7 +1,5 @@
 package com.robindrew.mediamanager.jetty.page.action;
 
-import static com.robindrew.common.dependency.DependencyFactory.getDependency;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +12,12 @@ public class ModifyTagAction {
 
 	private static final Splitter splitter = Splitter.on(',').omitEmptyStrings().trimResults();
 
+	private final IMediaFileTagCache cache;
+	
+	public ModifyTagAction(IMediaFileTagCache cache) {
+		this.cache = cache;
+	}
+	
 	public void execute(String tags, int fileId) {
 		if (tags == null || tags.trim().isEmpty()) {
 			return;
@@ -24,7 +28,6 @@ public class ModifyTagAction {
 		tags = tags.trim();
 
 		// Remove all Tags?
-		IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
 		if (tags.equals("--")) {
 
 			log.info("[Remove All Tags] #{}", fileId);
