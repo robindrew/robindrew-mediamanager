@@ -15,6 +15,9 @@ import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
@@ -27,6 +30,7 @@ import com.robindrew.mediamanager.component.file.manager.archive.FileArchive;
 import com.robindrew.mediamanager.component.file.manager.archive.IArchivedFile;
 import com.robindrew.mediamanager.component.file.manager.archive.IFileArchive;
 
+@Component
 public class MediaFileManager implements IMediaFileManager {
 
 	private static final Logger log = LoggerFactory.getLogger(MediaFileManager.class);
@@ -36,7 +40,7 @@ public class MediaFileManager implements IMediaFileManager {
 	private final IMediaFileCache cache;
 	private final List<File> files = new ArrayList<>();
 
-	public MediaFileManager(File rootDirectory, IMediaFileCache cache) {
+	public MediaFileManager(@Value("${root.directory}") File rootDirectory, @Autowired IMediaFileCache cache) {
 		this.rootDirectory = existsDirectory("rootDirectory", rootDirectory);
 		this.rootDirectoryPath = rootDirectory.getAbsolutePath();
 		this.cache = cache;

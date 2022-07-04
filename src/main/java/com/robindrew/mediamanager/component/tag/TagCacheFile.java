@@ -9,12 +9,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import com.google.common.base.Joiner;
 import com.google.common.base.Joiner.MapJoiner;
 import com.google.common.base.Splitter;
 import com.google.common.base.Splitter.MapSplitter;
 import com.robindrew.common.io.file.Files;
 
+@Component
 public class TagCacheFile implements ITagCache {
 
 	private static final MapSplitter splitter = Splitter.onPattern("\r\n").omitEmptyStrings().trimResults().withKeyValueSeparator(",");
@@ -25,7 +29,7 @@ public class TagCacheFile implements ITagCache {
 	private final ConcurrentMap<String, ITag> tagToNumberMap = new ConcurrentHashMap<>();
 	private final ConcurrentMap<Integer, ITag> numberToTagMap = new ConcurrentHashMap<>();
 
-	public TagCacheFile(File file) {
+	public TagCacheFile(@Value("${tag.cache.file}") File file) {
 		this.file = file;
 
 		readFromFile();

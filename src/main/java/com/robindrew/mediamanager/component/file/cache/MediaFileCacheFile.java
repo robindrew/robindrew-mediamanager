@@ -13,6 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableSet;
@@ -20,6 +22,7 @@ import com.google.common.io.LineProcessor;
 import com.robindrew.common.base.Preconditions;
 import com.robindrew.common.io.file.Files;
 
+@Component
 public class MediaFileCacheFile implements IMediaFileCache {
 
 	public static final String normalizePath(String path) {
@@ -34,7 +37,7 @@ public class MediaFileCacheFile implements IMediaFileCache {
 	private final Map<String, IMediaFile> pathToFileMap = new TreeMap<>();
 	private final Set<String> sourcePathSet = new TreeSet<>();
 
-	public MediaFileCacheFile(File cacheFile) {
+	public MediaFileCacheFile(@Value("${cache.file}") File cacheFile) {
 		this.cacheFile = Preconditions.notNull("cacheFile", cacheFile);
 
 		readCacheFile();

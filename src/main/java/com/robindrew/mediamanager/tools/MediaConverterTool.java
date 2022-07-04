@@ -13,9 +13,9 @@ import org.slf4j.LoggerFactory;
 
 import com.robindrew.common.io.file.Files;
 
-public class MediaConverter implements AutoCloseable {
+public class MediaConverterTool implements AutoCloseable {
 
-	private static final Logger log = LoggerFactory.getLogger(MediaConverter.class);
+	private static final Logger log = LoggerFactory.getLogger(MediaConverterTool.class);
 
 	private static final String EXE_FILENAME = "ffmpeg.exe";
 
@@ -36,7 +36,7 @@ public class MediaConverter implements AutoCloseable {
 			}
 
 			File outputFile = new File(outputDir, inputName + ".mp4");
-			try (MediaConverter converter = new MediaConverter(path)) {
+			try (MediaConverterTool converter = new MediaConverterTool(path)) {
 				converter.convert(inputFile, outputFile);
 			}
 		}
@@ -46,7 +46,7 @@ public class MediaConverter implements AutoCloseable {
 	private final File path;
 	private final ExecutorService service = Executors.newCachedThreadPool();
 
-	public MediaConverter(File path) {
+	public MediaConverterTool(File path) {
 		if (!path.isDirectory()) {
 			throw new IllegalArgumentException("Not a directory: '" + path + "'");
 		}

@@ -6,14 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.ServletComponentScan;
+import org.springframework.context.annotation.ComponentScan;
 
 import com.robindrew.common.web.Bootstrap;
-import com.robindrew.spring.BaseSpringService;
+import com.robindrew.spring.AbstractSpringService;
 import com.robindrew.spring.component.indexlink.IndexLinkMap;
 
 @SpringBootApplication
+@ComponentScan(basePackages = "com.robindrew.mediamanager.component")
 @ServletComponentScan(basePackages = "com.robindrew.mediamanager.servlet")
-public class MediaManagerService extends BaseSpringService {
+public class MediaManagerService extends AbstractSpringService {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MediaManagerService.class, args);

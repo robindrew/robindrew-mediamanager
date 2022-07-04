@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorConvertOp;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,10 +17,12 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import javax.annotation.PostConstruct;
-import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.io.ByteStreams;
@@ -31,7 +32,6 @@ import com.robindrew.common.base.Threads;
 import com.robindrew.common.image.IImageOutput;
 import com.robindrew.common.image.ImageFormat;
 import com.robindrew.common.image.ImageOutput;
-import com.robindrew.common.image.ImageResizer;
 import com.robindrew.common.image.Images;
 import com.robindrew.common.io.file.Files;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
@@ -39,23 +39,8 @@ import com.robindrew.mediamanager.component.file.cache.MediaType;
 import com.robindrew.mediamanager.component.file.loader.frame.MediaFrame;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 
+@Component
 public class MediaFileLoader implements IMediaFileLoader {
-
-	public static void main(String[] args) throws IOException {
-		File fromFile = new File("C:/temp/shard/Photo 0010.jpg");
-		File toFile = new File("C:/temp/shard/Photo 0010a.jpg");
-		toFile.delete();
-
-		byte[] bytes = Files.readToBytes(fromFile);
-		BufferedImage image = ImageIO.read(new ByteArrayInputStream(bytes));
-		ImageResizer resizer = new ImageResizer();
-		resizer.setBackground(Color.WHITE);
-		image = resize(image, 320, 240);
-		System.out.println(image.getType());
-		image = convertColorspace(image, BufferedImage.TYPE_INT_RGB);
-		ImageOutput output = new ImageOutput(image, ImageFormat.JPG);
-		output.writeToFile(toFile);
-	}
 
 	public static final BufferedImage convertColorspace(BufferedImage image, int newType) {
 		BufferedImage raw_image = image;
@@ -99,7 +84,7 @@ public class MediaFileLoader implements IMediaFileLoader {
 	private final Map<ImageKey, Reference<byte[]>> imageCache = new ConcurrentHashMap<>();
 	private final File cacheDirectory;
 
-	public MediaFileLoader(IMediaFileManager manager, File cacheDirectory) {
+	public MediaFileLoader(@Autowired IMediaFileManager manager, @Value("${cache.file.directory}") File cacheDirectory) {
 		this.manager = Preconditions.notNull("manager", manager);
 		this.cacheDirectory = Preconditions.existsDirectory("cacheDirectory", cacheDirectory);
 	}
