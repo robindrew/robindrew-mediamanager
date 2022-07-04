@@ -1,39 +1,42 @@
 package com.robindrew.mediamanager.jetty.page;
 
-import static com.robindrew.common.dependency.DependencyFactory.getDependency;
 import static com.robindrew.mediamanager.files.media.MediaType.PHOTO;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.robindrew.common.http.servlet.executor.IVelocityHttpContext;
+import javax.servlet.annotation.WebServlet;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.robindrew.common.http.response.IHttpResponse;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
-import com.robindrew.common.http.servlet.response.IHttpResponse;
-import com.robindrew.common.service.component.jetty.handler.page.AbstractServicePage;
+import com.robindrew.common.http.servlet.template.AbstractTemplateServlet;
+import com.robindrew.common.http.servlet.template.TemplateResource;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.IMediaFileCollection;
 import com.robindrew.mediamanager.files.media.MediaFileCollection;
 import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
 
-public class PhotosPage extends AbstractServicePage {
+@WebServlet(urlPatterns = "/Photos")
+@TemplateResource("site/media/Photos.html")
+public class PhotosPage extends AbstractTemplateServlet {
 
-	public PhotosPage(IVelocityHttpContext context, String templateName) {
-		super(context, templateName);
-	}
-
+	@Autowired
+	private IMediaFileTagCache tagCache;
+	@Autowired
+	private IFileManager fileManager;
+	
 	@Override
 	protected void execute(IHttpRequest request, IHttpResponse response, Map<String, Object> dataMap) {
 		super.execute(request, response, dataMap);
 
-		IFileManager manager = getDependency(IFileManager.class);
-		Set<IMediaFile> files = manager.getMediaFiles();
+		Set<IMediaFile> files = fileManager.getMediaFiles();
 		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(PHOTO, files);
 
-		IMediaFileTagCache tagCache = getDependency(IMediaFileTagCache.class);
-
-		dataMap.put("root", manager.getRootDirectory());
+		dataMap.put("root", fileManager.getRootDirectory());
 		dataMap.put("collections", collections);
 		dataMap.put("tagCache", tagCache);
 	}

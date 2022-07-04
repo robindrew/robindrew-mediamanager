@@ -2,10 +2,10 @@ package com.robindrew.mediamanager.files.media;
 
 import java.util.Set;
 
-import com.robindrew.common.dependency.DependencyFactory;
-import com.robindrew.common.util.Check;
+import com.robindrew.common.base.Preconditions;
 import com.robindrew.mediamanager.files.media.tag.ITag;
 import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
+import com.robindrew.spring.Spring;
 
 public class MediaFile implements IMediaFile {
 
@@ -15,8 +15,8 @@ public class MediaFile implements IMediaFile {
 
 	public MediaFile(int id, String path, MediaFileType type) {
 		this.id = id;
-		this.path = Check.notEmpty("path", path);
-		this.type = Check.notNull("type", type);
+		this.path = Preconditions.notEmpty("path", path);
+		this.type = Preconditions.notNull("type", type);
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class MediaFile implements IMediaFile {
 
 	@Override
 	public Set<ITag> getTags() {
-		IMediaFileTagCache cache = DependencyFactory.getDependency(IMediaFileTagCache.class);
+		IMediaFileTagCache cache = Spring.getBean(IMediaFileTagCache.class);
 		return cache.getTags(getId());
 	}
 

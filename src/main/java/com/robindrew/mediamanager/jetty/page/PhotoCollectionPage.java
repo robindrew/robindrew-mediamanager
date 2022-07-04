@@ -22,7 +22,9 @@ import com.robindrew.mediamanager.files.media.MediaFileCollection;
 import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
 import com.robindrew.mediamanager.jetty.page.action.ModifyTagAction;
 
-public class PhotoCollectionPage extends AbstractServicePage {
+@WebServlet(urlPatterns = "/Photos/Collection")
+@TemplateResource("site/media/photos/Collection.html")
+public class PhotoCollectionPage extends AbstractTemplateServlet {
 
 	private static final IntegerProperty defaultPhotosPerPage = new IntegerProperty("photos.per.page").defaultValue(6);
 

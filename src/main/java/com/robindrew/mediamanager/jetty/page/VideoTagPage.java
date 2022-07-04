@@ -1,19 +1,22 @@
 package com.robindrew.mediamanager.jetty.page;
 
-import static com.robindrew.common.dependency.DependencyFactory.getDependency;
 import static com.robindrew.mediamanager.files.media.MediaType.VIDEO;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.servlet.annotation.WebServlet;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+
 import com.robindrew.common.collect.IPaginator;
 import com.robindrew.common.collect.Paginator;
-import com.robindrew.common.http.servlet.executor.IVelocityHttpContext;
+import com.robindrew.common.http.response.IHttpResponse;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
-import com.robindrew.common.http.servlet.response.IHttpResponse;
-import com.robindrew.common.properties.map.type.IntegerProperty;
-import com.robindrew.common.service.component.jetty.handler.page.AbstractServicePage;
+import com.robindrew.common.http.servlet.template.AbstractTemplateServlet;
+import com.robindrew.common.http.servlet.template.TemplateResource;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.tag.ITag;
 import com.robindrew.mediamanager.files.media.tag.ITagCache;
@@ -22,34 +25,35 @@ import com.robindrew.mediamanager.files.media.tag.file.IMediaFileTagCache;
 import com.robindrew.mediamanager.jetty.page.action.ModifyTagAction;
 import com.robindrew.mediamanager.jetty.page.view.MediaFileTagView;
 
-public class VideoTagPage extends AbstractServicePage {
+@WebServlet(urlPatterns = "/Videos/Tag")
+@TemplateResource("site/media/videos/Tag.html")
+public class VideoTagPage extends AbstractTemplateServlet {
 
-	private static final IntegerProperty defaultVideosPerPage = new IntegerProperty("videos.per.page").defaultValue(9);
+	@Value("${videos.per.page}")
+	private int defaultVideosPerPage = 9;
 
-	public VideoTagPage(IVelocityHttpContext context, String templateName) {
-		super(context, templateName);
-	}
-
+	@Autowired
+	private ITagCache tagCache;
+	@Autowired
+	private IMediaFileTagCache fileTagCache;
+	@Autowired
+	private IFileManager fileManager;
+	
 	@Override
 	protected void execute(IHttpRequest request, IHttpResponse response, Map<String, Object> dataMap) {
 		super.execute(request, response, dataMap);
 
 		int tagNumber = request.getInteger("tagNumber");
 		int pageNumber = request.getInteger("number", 1);
-		int pageSize = request.getInteger("size", defaultVideosPerPage.get());
+		int pageSize = request.getInteger("size", defaultVideosPerPage);
 		int tagId = request.getInteger("tagId", -1);
 		String tags = request.getString("tag", null);
 
 		new ModifyTagAction().execute(tags, tagId);
 
-		ITagCache tagCache = getDependency(ITagCache.class);
 		ITag tag = tagCache.getTag(tagNumber);
-
-		IMediaFileTagCache cache = getDependency(IMediaFileTagCache.class);
-		Set<IMediaFileTag> fileTags = cache.getFileTags(tag);
-
-		IFileManager manager = getDependency(IFileManager.class);
-		Set<MediaFileTagView> views = MediaFileTagView.from(manager, fileTags, VIDEO);
+		Set<IMediaFileTag> fileTags = fileTagCache.getFileTags(tag);
+		Set<MediaFileTagView> views = MediaFileTagView.from(fileManager, fileTags, VIDEO);
 
 		IPaginator<MediaFileTagView> paginator = new Paginator<>(views);
 		List<MediaFileTagView> page = paginator.getPage(pageNumber, pageSize);

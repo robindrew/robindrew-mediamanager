@@ -19,17 +19,17 @@ import javax.imageio.ImageIO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.context.ConfigurationWarningsApplicationContextInitializer.Check;
 
 import com.google.common.base.Stopwatch;
 import com.google.common.io.ByteStreams;
+import com.robindrew.common.base.Java;
 import com.robindrew.common.image.IImageOutput;
 import com.robindrew.common.image.ImageFormat;
 import com.robindrew.common.image.ImageOutput;
 import com.robindrew.common.image.ImageResizer;
 import com.robindrew.common.image.Images;
 import com.robindrew.common.io.Files;
-import com.robindrew.common.util.Check;
-import com.robindrew.common.util.Java;
 import com.robindrew.mediamanager.files.manager.IFileManager;
 import com.robindrew.mediamanager.files.media.IMediaFile;
 import com.robindrew.mediamanager.files.media.frame.MediaFrame;
