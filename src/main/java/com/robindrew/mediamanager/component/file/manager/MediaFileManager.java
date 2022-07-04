@@ -23,9 +23,9 @@ import com.robindrew.common.io.file.Files;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
 import com.robindrew.mediamanager.component.file.cache.IMediaFileCache;
 import com.robindrew.mediamanager.component.file.cache.MediaFileType;
-import com.robindrew.mediamanager.files.archive.FileArchive;
-import com.robindrew.mediamanager.files.archive.IArchivedFile;
-import com.robindrew.mediamanager.files.archive.IFileArchive;
+import com.robindrew.mediamanager.component.file.manager.archive.FileArchive;
+import com.robindrew.mediamanager.component.file.manager.archive.IArchivedFile;
+import com.robindrew.mediamanager.component.file.manager.archive.IFileArchive;
 
 public class MediaFileManager implements IMediaFileManager {
 

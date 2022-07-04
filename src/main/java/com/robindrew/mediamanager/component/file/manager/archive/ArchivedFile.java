@@ -1,4 +1,4 @@
-package com.robindrew.mediamanager.files.archive;
+package com.robindrew.mediamanager.component.file.manager.archive;
 
 import java.io.File;
 

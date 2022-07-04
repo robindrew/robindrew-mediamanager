@@ -1,4 +1,4 @@
-package com.robindrew.mediamanager.files.archive;
+package com.robindrew.mediamanager.component.file.manager.archive;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
