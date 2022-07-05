@@ -15,8 +15,6 @@ import com.robindrew.common.collect.IPaginator;
 import com.robindrew.common.collect.Paginator;
 import com.robindrew.common.http.response.IHttpResponse;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
-import com.robindrew.common.http.servlet.template.AbstractTemplateServlet;
-import com.robindrew.common.http.servlet.template.TemplateResource;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 import com.robindrew.mediamanager.component.file.tagcache.IMediaFileTag;
 import com.robindrew.mediamanager.component.file.tagcache.IMediaFileTagCache;
@@ -24,9 +22,11 @@ import com.robindrew.mediamanager.component.tag.ITag;
 import com.robindrew.mediamanager.component.tag.ITagCache;
 import com.robindrew.mediamanager.servlet.action.ModifyTagAction;
 import com.robindrew.mediamanager.servlet.view.MediaFileTagView;
+import com.robindrew.spring.component.servlet.template.AbstractTemplateServlet;
+import com.robindrew.spring.component.servlet.template.TemplateResource;
 
 @WebServlet(urlPatterns = "/Videos/Tag")
-@TemplateResource("site/media/videos/Tag.html")
+@TemplateResource("templates/videos/Tag.html")
 public class VideoTagServlet extends AbstractTemplateServlet {
 
 	@Value("${videos.per.page:9}")

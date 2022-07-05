@@ -16,17 +16,17 @@ import com.robindrew.common.collect.IPaginator;
 import com.robindrew.common.collect.Paginator;
 import com.robindrew.common.http.response.IHttpResponse;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
-import com.robindrew.common.http.servlet.template.AbstractTemplateServlet;
-import com.robindrew.common.http.servlet.template.TemplateResource;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
 import com.robindrew.mediamanager.component.file.cache.IMediaFileCollection;
 import com.robindrew.mediamanager.component.file.cache.MediaFileCollection;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 import com.robindrew.mediamanager.component.file.tagcache.IMediaFileTagCache;
 import com.robindrew.mediamanager.servlet.action.ModifyTagAction;
+import com.robindrew.spring.component.servlet.template.AbstractTemplateServlet;
+import com.robindrew.spring.component.servlet.template.TemplateResource;
 
 @WebServlet(urlPatterns = "/Photos/Collection")
-@TemplateResource("site/media/photos/Collection.html")
+@TemplateResource("templates/photos/Collection.html")
 public class PhotoCollectionServlet extends AbstractTemplateServlet {
 
 	@Value("${photos.per.page}")
