@@ -13,8 +13,8 @@ import com.robindrew.spring.AbstractSpringService;
 import com.robindrew.spring.component.indexlink.IndexLinkMap;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.robindrew.mediamanager")
-@ServletComponentScan(basePackages = "com.robindrew.mediamanager")
+@ComponentScan(basePackages = "com.robindrew.mediamanager.component")
+@ServletComponentScan(basePackages = "com.robindrew.mediamanager.servlet")
 public class MediaManagerService extends AbstractSpringService {
 
 	public static void main(String[] args) {

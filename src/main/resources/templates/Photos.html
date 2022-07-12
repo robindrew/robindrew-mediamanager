@@ -60,7 +60,7 @@ a:link, a:visited a:link:active, a:visited:active {
 <div class="col-md-12">
 <h3><span class="glyphicon glyphicon-picture" aria-hidden="true"></span> Photos</h3>
 <hr/>
-#foreach($tag in $tagCache.tags)
+#foreach($tag in $tags)
 <a href="/Photos/Tag?tagNumber=${tag.number}"><span class="label label-primary">$tag</span></a>
 #end
 <hr/>

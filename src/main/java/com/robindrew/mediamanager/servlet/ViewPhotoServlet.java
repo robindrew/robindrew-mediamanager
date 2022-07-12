@@ -14,7 +14,7 @@ import com.robindrew.mediamanager.component.file.loader.IMediaFileLoader;
 import com.robindrew.mediamanager.component.file.loader.LoaderContext;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 
-@WebServlet(urlPatterns = "/Photos/ViewPhoto")
+@WebServlet(urlPatterns = "/Photos/ViewPhoto/*")
 public class ViewPhotoServlet extends AbstractBaseServlet {
 
 	@Autowired

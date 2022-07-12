@@ -1,4 +1,4 @@
-package com.robindrew.mediamanager.servlet;
+package com.robindrew.mediamanager.component.controller;
 
 import static com.robindrew.mediamanager.component.file.cache.MediaFileCollection.splitToListWithType;
 import static com.robindrew.mediamanager.component.file.cache.MediaType.PHOTO;
@@ -9,6 +9,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +27,11 @@ import com.robindrew.mediamanager.component.file.cache.IMediaFile;
 import com.robindrew.mediamanager.component.file.cache.IMediaFileCollection;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 import com.robindrew.mediamanager.component.file.tagcache.IMediaFileTagCache;
+import com.robindrew.mediamanager.component.tag.ITag;
 import com.robindrew.spring.component.servlet.template.VelocityDataMapper;
 
 @Controller
-public class MediaController {
+public class MediaServletController {
 
 	@Autowired
 	private IMediaFileManager fileManager;
@@ -42,12 +44,14 @@ public class MediaController {
 	public ModelMap videos() {
 
 		Set<IMediaFile> files = fileManager.getMediaFiles();
-		List<IMediaFileCollection> collections = splitToListWithType(VIDEO, files);
+		Set<ITag> tags = new TreeSet<>();
+		List<IMediaFileCollection> collections = splitToListWithType(VIDEO, files, tags);
 
 		ModelMap dataMap = mapper.newModelMap();
 		dataMap.put("root", fileManager.getRootDirectory());
 		dataMap.put("collections", collections);
 		dataMap.put("tagCache", fileTagCache);
+		dataMap.put("tags", tags);
 		return dataMap;
 	}
 
@@ -55,12 +59,14 @@ public class MediaController {
 	public ModelMap photos() {
 
 		Set<IMediaFile> files = fileManager.getMediaFiles();
-		List<IMediaFileCollection> collections = splitToListWithType(PHOTO, files);
+		Set<ITag> tags = new TreeSet<>();
+		List<IMediaFileCollection> collections = splitToListWithType(PHOTO, files, tags);
 
 		ModelMap dataMap = mapper.newModelMap();
 		dataMap.put("root", fileManager.getRootDirectory());
 		dataMap.put("collections", collections);
 		dataMap.put("tagCache", fileTagCache);
+		dataMap.put("tags", tags);
 		return dataMap;
 	}
 

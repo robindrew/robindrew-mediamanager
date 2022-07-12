@@ -10,14 +10,22 @@ import com.google.common.collect.MultimapBuilder.SetMultimapBuilder;
 import com.google.common.collect.SetMultimap;
 import com.robindrew.common.base.Preconditions;
 import com.robindrew.common.text.Strings;
+import com.robindrew.mediamanager.component.tag.ITag;
 
 public class MediaFileCollection implements IMediaFileCollection {
 
 	public static List<IMediaFileCollection> splitToListWithType(MediaType type, Collection<? extends IMediaFile> files) {
+		return splitToListWithType(type, files, null);
+	}
+
+	public static List<IMediaFileCollection> splitToListWithType(MediaType type, Collection<? extends IMediaFile> files, Set<ITag> tagSet) {
 
 		SetMultimap<String, IMediaFile> collectionMap = SetMultimapBuilder.treeKeys().linkedHashSetValues().build();
 		for (IMediaFile file : files) {
 			if (file.getType().getType().equals(type)) {
+				if (tagSet != null) {
+					tagSet.addAll(file.getTags());
+				}
 				collectionMap.put(getKey(file), file);
 			}
 		}

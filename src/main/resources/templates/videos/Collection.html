@@ -65,11 +65,11 @@ ${collection.name}
 #end
 
 #foreach($file in $page)
-<div class="col-md-4 col-sm-6">
+<div class="col-md-3 col-sm-6">
 <div class="thumbnail">
-<div style="width:320px; height:240px;">
+<div style="width:256px; height:192px;">
 <a href="/Videos/ViewVideo?id=${file.id}" target="_video${file.id}">
-<img src="/Videos/ViewVideoFrame?id=${file.id}&s=5"/>
+<img src="/Videos/ViewVideoFrame?id=${file.id}&s=5&width=256"/>
 </a>
 </div>
 <div class="caption">
