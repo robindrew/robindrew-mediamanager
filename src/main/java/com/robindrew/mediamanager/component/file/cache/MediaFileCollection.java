@@ -14,11 +14,29 @@ import com.robindrew.mediamanager.component.tag.ITag;
 
 public class MediaFileCollection implements IMediaFileCollection {
 
-	public static List<IMediaFileCollection> splitToListWithType(MediaType type, Collection<? extends IMediaFile> files) {
-		return splitToListWithType(type, files, null);
+	public static List<IMediaFile> filterByType(MediaType type, Collection<? extends IMediaFile> files) {
+		return filterByType(type, files, null);
 	}
 
-	public static List<IMediaFileCollection> splitToListWithType(MediaType type, Collection<? extends IMediaFile> files, Set<ITag> tagSet) {
+	public static List<IMediaFileCollection> splitToCollectionsWithType(MediaType type, Collection<? extends IMediaFile> files) {
+		return splitToCollectionsWithType(type, files, null);
+	}
+
+	public static List<IMediaFile> filterByType(MediaType type, Collection<? extends IMediaFile> files, Set<ITag> tagSet) {
+
+		List<IMediaFile> filtered = new ArrayList<>();
+		for (IMediaFile file : files) {
+			if (file.getType().getType().equals(type)) {
+				if (tagSet != null) {
+					tagSet.addAll(file.getTags());
+				}
+				filtered.add(file);
+			}
+		}
+		return filtered;
+	}
+
+	public static List<IMediaFileCollection> splitToCollectionsWithType(MediaType type, Collection<? extends IMediaFile> files, Set<ITag> tagSet) {
 
 		SetMultimap<String, IMediaFile> collectionMap = SetMultimapBuilder.treeKeys().linkedHashSetValues().build();
 		for (IMediaFile file : files) {

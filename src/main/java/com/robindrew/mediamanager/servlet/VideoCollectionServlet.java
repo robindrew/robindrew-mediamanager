@@ -17,7 +17,6 @@ import com.robindrew.common.collect.Paginator;
 import com.robindrew.common.http.response.IHttpResponse;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
-import com.robindrew.mediamanager.component.file.cache.IMediaFileCollection;
 import com.robindrew.mediamanager.component.file.cache.MediaFileCollection;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 import com.robindrew.mediamanager.component.file.tagcache.IMediaFileTagCache;
@@ -29,7 +28,7 @@ import com.robindrew.spring.component.servlet.template.TemplateResource;
 @TemplateResource("templates/videos/Collection.html")
 public class VideoCollectionServlet extends AbstractTemplateServlet {
 
-	@Value("${videos.per.page:10}")
+	@Value("${videos.per.page:16}")
 	private int defaultVideosPerPage;
 
 	@Autowired
@@ -41,8 +40,6 @@ public class VideoCollectionServlet extends AbstractTemplateServlet {
 	protected void execute(IHttpRequest request, IHttpResponse response, Map<String, Object> dataMap) {
 		super.execute(request, response, dataMap);
 
-		String name = request.getString("name");
-		String type = request.getString("type", "name");
 		int pageNumber = request.getInteger("number", 1);
 		int pageSize = request.getInteger("size", defaultVideosPerPage);
 		String tags = request.getString("tag", null);
@@ -52,15 +49,12 @@ public class VideoCollectionServlet extends AbstractTemplateServlet {
 		new ModifyTagAction(fileTagCache).execute(tags, tagId);
 
 		Set<IMediaFile> files = fileManager.getMediaFiles();
-		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(VIDEO, files);
+		List<IMediaFile> filtered = MediaFileCollection.filterByType(VIDEO, files);
 
-		int index = indexOf(collections, name, type);
-		IMediaFileCollection collection = collections.get(index);
-		files = collection.getFiles();
-
-		String nextName = (index == (collections.size() - 1)) ? name : collections.get(index + 1).getName();
-		String prevName = (index == 0) ? name : collections.get(index - 1).getName();
-
+		IPaginator<IMediaFile> paginator = new Paginator<>(filtered);
+		filtered = paginator.getPage(pageNumber, pageSize);
+		int pageCount = paginator.getPageCount(pageSize);
+		
 		// Tag All command
 		if (allTags != null) {
 			for (String tagName : Splitter.on(',').omitEmptyStrings().trimResults().split(allTags)) {
@@ -70,42 +64,14 @@ public class VideoCollectionServlet extends AbstractTemplateServlet {
 			}
 		}
 
-		IPaginator<IMediaFile> paginator = new Paginator<>(files);
-		List<IMediaFile> page = paginator.getPage(pageNumber, pageSize);
-		List<IMediaFile> next = paginator.getPage(pageNumber + 1, pageSize);
-		int pageCount = paginator.getPageCount(pageSize);
 
 		dataMap.put("root", fileManager.getRootDirectory());
-		dataMap.put("collection", collection);
-		dataMap.put("page", page);
+		dataMap.put("files", filtered);
 		dataMap.put("pageSize", pageSize);
 		dataMap.put("previousPage", pageNumber - 1);
 		dataMap.put("currentPage", pageNumber);
-		dataMap.put("nextPage", next.isEmpty() ? 0 : pageNumber + 1);
+		dataMap.put("nextPage", pageCount == pageNumber ? 0 : pageNumber + 1);
 		dataMap.put("pageCount", pageCount);
-		dataMap.put("prevName", prevName);
-		dataMap.put("nextName", nextName);
-	}
-
-	private int indexOf(List<IMediaFileCollection> collections, String name, String type) {
-		if (type.equals("name")) {
-			for (int i = 0; i < collections.size(); i++) {
-				IMediaFileCollection collection = collections.get(i);
-				if (collection.getName().equals(name)) {
-					return i;
-				}
-			}
-		}
-		if (type.equals("id")) {
-			int id = Integer.parseInt(name);
-			for (int i = 0; i < collections.size(); i++) {
-				IMediaFileCollection collection = collections.get(i);
-				if (collection.contains(id)) {
-					return i;
-				}
-			}
-		}
-		throw new IllegalArgumentException("name=" + name + ", type=" + type);
 	}
 
 }

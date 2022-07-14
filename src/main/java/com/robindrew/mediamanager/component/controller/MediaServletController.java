@@ -1,6 +1,6 @@
 package com.robindrew.mediamanager.component.controller;
 
-import static com.robindrew.mediamanager.component.file.cache.MediaFileCollection.splitToListWithType;
+import static com.robindrew.mediamanager.component.file.cache.MediaFileCollection.splitToCollectionsWithType;
 import static com.robindrew.mediamanager.component.file.cache.MediaType.PHOTO;
 import static com.robindrew.mediamanager.component.file.cache.MediaType.VIDEO;
 import static org.springframework.http.MediaType.parseMediaType;
@@ -45,7 +45,7 @@ public class MediaServletController {
 
 		Set<IMediaFile> files = fileManager.getMediaFiles();
 		Set<ITag> tags = new TreeSet<>();
-		List<IMediaFileCollection> collections = splitToListWithType(VIDEO, files, tags);
+		List<IMediaFileCollection> collections = splitToCollectionsWithType(VIDEO, files, tags);
 
 		ModelMap dataMap = mapper.newModelMap();
 		dataMap.put("root", fileManager.getRootDirectory());
@@ -60,7 +60,7 @@ public class MediaServletController {
 
 		Set<IMediaFile> files = fileManager.getMediaFiles();
 		Set<ITag> tags = new TreeSet<>();
-		List<IMediaFileCollection> collections = splitToListWithType(PHOTO, files, tags);
+		List<IMediaFileCollection> collections = splitToCollectionsWithType(PHOTO, files, tags);
 
 		ModelMap dataMap = mapper.newModelMap();
 		dataMap.put("root", fileManager.getRootDirectory());

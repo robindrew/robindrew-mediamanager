@@ -52,7 +52,7 @@ public class PhotoCollectionServlet extends AbstractTemplateServlet {
 		new ModifyTagAction(fileTagCache).execute(tags, tagId);
 
 		Set<IMediaFile> files = fileManager.getMediaFiles();
-		List<IMediaFileCollection> collections = MediaFileCollection.splitToListWithType(PHOTO, files);
+		List<IMediaFileCollection> collections = MediaFileCollection.splitToCollectionsWithType(PHOTO, files);
 
 		int index = indexOf(collections, name, type);
 		IMediaFileCollection collection = collections.get(index);
