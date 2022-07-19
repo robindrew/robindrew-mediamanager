@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -33,12 +32,15 @@ import com.robindrew.spring.component.servlet.template.VelocityDataMapper;
 @Controller
 public class MediaServletController {
 
-	@Autowired
-	private IMediaFileManager fileManager;
-	@Autowired
-	private IMediaFileTagCache fileTagCache;
-	@Autowired
-	private VelocityDataMapper mapper;
+	private final IMediaFileManager fileManager;
+	private final IMediaFileTagCache fileTagCache;
+	private final VelocityDataMapper mapper;
+
+	public MediaServletController(IMediaFileManager fileManager, IMediaFileTagCache fileTagCache, VelocityDataMapper mapper) {
+		this.fileManager = fileManager;
+		this.fileTagCache = fileTagCache;
+		this.mapper = mapper;
+	}
 
 	@GetMapping("/Videos")
 	public ModelMap videos() {

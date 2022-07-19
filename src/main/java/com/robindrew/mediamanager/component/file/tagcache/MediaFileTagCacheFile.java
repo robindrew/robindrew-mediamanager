@@ -10,7 +10,6 @@ import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -31,7 +30,7 @@ public class MediaFileTagCacheFile extends CachedObjectStoreFile<IMediaFileTag> 
 	private final SetMultimap<String, IMediaFileTag> tagNameCache = SetMultimapBuilder.treeKeys().treeSetValues().build();
 	private final SetMultimap<Integer, IMediaFileTag> fileIdCache = SetMultimapBuilder.treeKeys().treeSetValues().build();
 
-	public MediaFileTagCacheFile(@Autowired ITagCache tagCache, @Value("${media.tag.cache.file}") File file) {
+	public MediaFileTagCacheFile(ITagCache tagCache, @Value("${media.tag.cache.file}") File file) {
 		super(file);
 		this.tagCache = tagCache;
 		updateMaps();
