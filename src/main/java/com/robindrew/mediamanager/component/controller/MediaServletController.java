@@ -20,10 +20,12 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 
 import com.google.common.io.ByteSource;
 import com.google.common.io.ByteStreams;
+import com.robindrew.common.collect.Paginator;
 import com.robindrew.common.http.MimeType;
 import com.robindrew.common.io.file.Files;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
 import com.robindrew.mediamanager.component.file.cache.IMediaFileCollection;
+import com.robindrew.mediamanager.component.file.cache.MediaFileCollection;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 import com.robindrew.mediamanager.component.file.tagcache.IMediaFileTagCache;
 import com.robindrew.mediamanager.component.tag.ITag;
@@ -47,13 +49,16 @@ public class MediaServletController {
 
 		Set<IMediaFile> files = fileManager.getMediaFiles();
 		Set<ITag> tags = new TreeSet<>();
-		List<IMediaFileCollection> collections = splitToCollectionsWithType(VIDEO, files, tags);
+		List<IMediaFile> filtered = MediaFileCollection.filterByType(VIDEO, files, tags);
+		Paginator<IMediaFile> paginator = new Paginator<>(filtered);
+		paginator.getPageCount(16);
 
 		ModelMap dataMap = mapper.newModelMap();
 		dataMap.put("root", fileManager.getRootDirectory());
-		dataMap.put("collections", collections);
+		dataMap.put("filtered", filtered);
 		dataMap.put("tagCache", fileTagCache);
 		dataMap.put("tags", tags);
+		dataMap.put("pages", paginator.getPages(16));
 		return dataMap;
 	}
 
