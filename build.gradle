@@ -45,7 +45,8 @@ repositories {
 dependencies {
 
 	implementation project(":robindrew-common-spring")
-
+	implementation group: 'com.madgag', name: 'animated-gif-lib', version: '1.4'
+	
 	implementation 'org.jcodec:jcodec-javase:0.2.5'
 	implementation 'org.jcodec:jcodec:0.2.5'
 	implementation 'org.springframework.boot:spring-boot-starter-web:2.7.1'

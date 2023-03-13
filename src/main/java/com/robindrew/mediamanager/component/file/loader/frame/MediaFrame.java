@@ -28,6 +28,16 @@ public class MediaFrame implements IMediaFrame {
 		}
 	}
 
+	public MediaFrame(File file, int frameNumber) {
+		this.file = file;
+		this.timestamp = frameNumber;
+		try {
+			this.picture = FrameGrab.getFrameFromFile(file, frameNumber);
+		} catch (Throwable t) {
+			throw Throwables.propagate(t);
+		}
+	}
+
 	public BufferedImage toBufferedImage() {
 		return AWTUtil.toBufferedImage(picture);
 	}
