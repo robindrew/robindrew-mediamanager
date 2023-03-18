@@ -1,0 +1,89 @@
+<html>
+
+
+<head>
+<title>${title}</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+
+<style>
+body { padding-top: 10px; }
+form { display: inline; }
+a:link, a:visited a:link:active, a:visited:active { 
+    text-decoration: none;
+}
+</style>
+
+
+</head>
+
+
+<body>
+
+<!-- START CONTAINER -->
+<div class="container">
+
+
+<!-- NAV BAR -->
+<nav class="navbar navbar-default">
+<div class="container-fluid">
+<div class="navbar-header">
+<a class="navbar-brand" href="/">${serviceName} #${serviceInstance}</a>
+</div>
+<ul class="nav navbar-nav">
+<li><a href="/Videos">Videos</a></li>
+<li><a href="/Videos/Tag?tagNumber=${tag.number}">${tag.name}</a></li>
+<li class="active"><a href="/Videos/Tag?tagNumber=${tag.number}&number=${currentPage}">Page ${currentPage}</a></li>
+</ul>
+</div><!-- /.container-fluid -->
+</nav>
+<!-- NAV BAR -->
+
+
+<!-- START ROW -->
+<div class="row">
+
+<!-- TITLE -->
+<div class="col-md-12">
+<h3><span class="glyphicon glyphicon-picture" aria-hidden="true"></span> Video <span class="label label-primary">${mediaFile.id}</span></h3>
+<hr/>
+</div>
+
+
+<div class="col-md-4 col-sm-6">
+<div class="thumbnail">
+<div style="width:320px; height:240px;">
+<a href="/Videos/ViewVideo?id=${mediaFile.id}" target="_video${mediaFile.id}"><img src="/Videos/ViewVideoFrame?id=${mediaFile.id}&s=5"/></a>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 col-sm-6">
+<div class="thumbnail">
+<div style="width:320px; height:240px;">
+<a href="/Videos/ViewVideo?id=${mediaFile.id}" target="_video${mediaFile.id}"><img src="/Videos/ViewVideoFrame?id=${mediaFile.id}&s=10"/></a>
+</div>
+</div>
+</div>
+
+
+<!-- END ROW -->
+</div>
+
+<!-- END CONTAINER -->
+</div>
+
+
+
+<!-- JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js" ></script>
+<script>
+$(document).ready(function() {
+	
+});
+</script>
+</body>
+</html>

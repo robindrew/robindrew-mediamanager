@@ -11,6 +11,7 @@ import com.robindrew.common.http.servlet.AbstractBaseServlet;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
 import com.robindrew.mediamanager.component.file.loader.IMediaFileLoader;
+import com.robindrew.mediamanager.component.file.loader.ImageData;
 import com.robindrew.mediamanager.component.file.loader.LoaderContext;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 
@@ -30,17 +31,17 @@ public class ViewPhotoServlet extends AbstractBaseServlet {
 		boolean fit = request.getBoolean("fit", true);
 
 		// Special case
-		if (request.getRequestURI().endsWith(".GIF")) {
+		if (request.getRequestURI().toLowerCase().endsWith(".gif")) {
 			width = 0;
 			height = 0;
 		}
 
 		IMediaFile mediaFile = fileManager.getMediaFile(id);
 
-		byte[] image = loader.getImage(new LoaderContext(mediaFile, width, height).setFit(fit));
+		ImageData image = loader.getImage(new LoaderContext(mediaFile, width, height).setFit(fit));
 
-		String type = MimeType.forExtension(mediaFile.getName());
-		response.ok(type, ByteSource.wrap(image));
+		String type = MimeType.forExtension(image.getFormat().name());
+		response.ok(type, ByteSource.wrap(image.getImage()));
 	}
 
 }

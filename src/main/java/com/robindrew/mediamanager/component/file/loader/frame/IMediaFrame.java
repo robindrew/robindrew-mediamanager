@@ -2,10 +2,11 @@ package com.robindrew.mediamanager.component.file.loader.frame;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.math.BigDecimal;
 
 public interface IMediaFrame {
 
-	double getTimestamp();
+	BigDecimal getSeconds();
 
 	File getFile();
 

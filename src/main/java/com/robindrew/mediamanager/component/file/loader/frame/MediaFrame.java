@@ -3,6 +3,7 @@ package com.robindrew.mediamanager.component.file.loader.frame;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.math.BigDecimal;
 
 import javax.imageio.ImageIO;
 
@@ -15,14 +16,14 @@ import com.google.common.base.Throwables;
 public class MediaFrame implements IMediaFrame {
 
 	private final File file;
-	private final double timestamp;
+	private final BigDecimal seconds;
 	private final Picture picture;
 
-	public MediaFrame(File file, double timestamp) {
+	public MediaFrame(File file, BigDecimal seconds) {
 		this.file = file;
-		this.timestamp = timestamp;
+		this.seconds = seconds;
 		try {
-			this.picture = FrameGrab.getFrameAtSec(file, timestamp);
+			this.picture = FrameGrab.getFrameAtSec(file, seconds.doubleValue());
 		} catch (Throwable t) {
 			throw Throwables.propagate(t);
 		}
@@ -30,7 +31,7 @@ public class MediaFrame implements IMediaFrame {
 
 	public MediaFrame(File file, int frameNumber) {
 		this.file = file;
-		this.timestamp = frameNumber;
+		this.seconds = new BigDecimal(frameNumber);
 		try {
 			this.picture = FrameGrab.getFrameFromFile(file, frameNumber);
 		} catch (Throwable t) {
@@ -61,8 +62,8 @@ public class MediaFrame implements IMediaFrame {
 	}
 
 	@Override
-	public double getTimestamp() {
-		return timestamp;
+	public BigDecimal getSeconds() {
+		return seconds;
 	}
 
 	@Override

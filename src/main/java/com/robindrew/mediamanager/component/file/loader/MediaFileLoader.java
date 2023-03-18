@@ -1,5 +1,7 @@
 package com.robindrew.mediamanager.component.file.loader;
 
+import static java.math.BigDecimal.ZERO;
+
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
+import java.math.BigDecimal;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,11 +39,14 @@ import com.robindrew.common.image.Images;
 import com.robindrew.common.io.file.Files;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
 import com.robindrew.mediamanager.component.file.cache.MediaType;
+import com.robindrew.mediamanager.component.file.loader.frame.AnimatedGifWriter;
 import com.robindrew.mediamanager.component.file.loader.frame.MediaFrame;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 
 @Component
 public class MediaFileLoader implements IMediaFileLoader {
+
+	private static final Logger log = LoggerFactory.getLogger(MediaFileLoader.class);
 
 	public static final BufferedImage convertColorspace(BufferedImage image, int newType) {
 		BufferedImage raw_image = image;
@@ -78,10 +84,8 @@ public class MediaFileLoader implements IMediaFileLoader {
 		return newImage;
 	}
 
-	private static final Logger log = LoggerFactory.getLogger(MediaFileLoader.class);
-
 	private final IMediaFileManager manager;
-	private final Map<ImageKey, Reference<byte[]>> imageCache = new ConcurrentHashMap<>();
+	private final Map<ImageKey, Reference<ImageData>> imageCache = new ConcurrentHashMap<>();
 	private final File cacheDirectory;
 
 	public MediaFileLoader(@Autowired IMediaFileManager manager, @Value("${cache.file.directory}") File cacheDirectory) {
@@ -136,7 +140,7 @@ public class MediaFileLoader implements IMediaFileLoader {
 		}
 	}
 
-	public byte[] getImageData(LoaderContext context) {
+	public ImageData getImageData(LoaderContext context) {
 		try {
 
 			final IMediaFile mediaFile = context.getFile();
@@ -147,14 +151,33 @@ public class MediaFileLoader implements IMediaFileLoader {
 			if (mediaFile.getType().isPhoto()) {
 				byte[] imageData = readImageFromFile(mediaFile, file);
 				if (context.getWidth() == 0 && context.getHeight() == 0) {
-					return imageData;
+					return new ImageData(imageData);
 				}
 				image = Images.toBufferedImage(imageData);
-			} else {
-				image = new MediaFrame(file, context.getFrameSeconds()).toBufferedImage();
 			}
 
-			return resizeImage(image, context).writeToByteArray();
+			// Video
+			else {
+				BigDecimal duration = context.getFrameDuration();
+				if (duration.equals(ZERO)) {
+					image = new MediaFrame(file, context.getFrameSeconds()).toBufferedImage();
+				} else {
+					try {
+						AnimatedGifWriter writer = new AnimatedGifWriter();
+						double fromSecond = context.getFrameSeconds().doubleValue();
+						double toSecond = fromSecond + context.getFrameDuration().doubleValue();
+						byte[] imageData = writer.writeFrames(file, fromSecond, toSecond);
+						return new ImageData(imageData, ImageFormat.GIF);
+					} catch (Exception e) {
+						log.warn("Failed to write animated GIF for file " + file, e);
+						context.setFrameDuration(ZERO);
+						image = new MediaFrame(file, context.getFrameSeconds()).toBufferedImage();
+					}
+				}
+			}
+
+			byte[] data = resizeImage(image, context).writeToByteArray();
+			return new ImageData(data, context.getImageFormat());
 
 		} catch (Exception e) {
 			throw Java.propagate(e);
@@ -173,19 +196,19 @@ public class MediaFileLoader implements IMediaFileLoader {
 				image = Images.scaleImageToFit(image, width, height);
 			}
 		}
-		return new ImageOutput(image, ImageFormat.JPG);
+		return new ImageOutput(image, context.getImageFormat());
 	}
 
 	@Override
-	public byte[] getImage(LoaderContext context) {
+	public ImageData getImage(LoaderContext context) {
 
 		ImageKey key = context.toKey();
-		Reference<byte[]> reference = imageCache.get(key);
-		byte[] image = reference == null ? null : reference.get();
+		Reference<ImageData> reference = imageCache.get(key);
+		ImageData image = reference == null ? null : reference.get();
 		if (image == null) {
 
 			// Read from file system
-			image = readFromDirectory(key);
+			image = readFromDirectory(key, context.getImageFormat());
 
 			if (image == null) {
 				Stopwatch timer = Stopwatch.createStarted();
@@ -202,18 +225,35 @@ public class MediaFileLoader implements IMediaFileLoader {
 		return image;
 	}
 
-	private byte[] readFromDirectory(ImageKey key) {
-		File file = new File(cacheDirectory, key.getWidth() + "x" + key.getHeight() + "/" + (key.getId() / 100) + "/" + key.getId() + ".jpg");
-		if (file.exists()) {
-			return Files.readToBytes(file);
+	private ImageData readFromDirectory(ImageKey key, ImageFormat format) {
+		File file = new File(cacheDirectory, getFilename(key, format));
+		if (!file.exists()) {
+			return null;
 		}
-		return null;
+		byte[] image = Files.readToBytes(file);
+		return new ImageData(image, file);
 	}
 
-	private void writeToDirectory(ImageKey key, byte[] image) {
-		File file = new File(cacheDirectory, key.getWidth() + "x" + key.getHeight() + "/" + (key.getId() / 100) + "/" + key.getId() + ".jpg");
+	private String getFilename(ImageKey key, ImageFormat format) {
+		StringBuilder name = new StringBuilder();
+		name.append(key.getWidth()).append("x");
+		name.append(key.getHeight()).append("/");
+		name.append(key.getId() / 100).append("/");
+		name.append(key.getId());
+		if (key.hasSeconds()) {
+			name.append("-").append(key.getSeconds());
+		}
+		if (key.hasDuration()) {
+			name.append("-").append(key.getDuration());
+		}
+		name.append(".").append(format.name().toLowerCase());
+		return name.toString();
+	}
+
+	private void writeToDirectory(ImageKey key, ImageData data) {
+		File file = new File(cacheDirectory, getFilename(key, data.getFormat()));
 		file.getParentFile().mkdirs();
-		Files.writeFromBytes(file, image);
+		Files.writeFromBytes(file, data.getImage());
 	}
 
 }

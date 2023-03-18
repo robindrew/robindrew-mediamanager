@@ -1,5 +1,7 @@
 package com.robindrew.mediamanager.servlet;
 
+import java.math.BigDecimal;
+
 import javax.servlet.annotation.WebServlet;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +13,7 @@ import com.robindrew.common.http.servlet.AbstractBaseServlet;
 import com.robindrew.common.http.servlet.request.IHttpRequest;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
 import com.robindrew.mediamanager.component.file.loader.IMediaFileLoader;
+import com.robindrew.mediamanager.component.file.loader.ImageData;
 import com.robindrew.mediamanager.component.file.loader.LoaderContext;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 
@@ -28,15 +31,17 @@ public class ViewVideoFrameServlet extends AbstractBaseServlet {
 		int id = request.getInteger("id");
 		int width = request.getInteger("width", 0);
 		int height = request.getInteger("height", 0);
-		int seconds = request.getInteger("s", 5);
+		BigDecimal seconds = request.getBigDecimal("s", new BigDecimal(5));
+		BigDecimal duration = request.getBigDecimal("d", new BigDecimal(3));
 		boolean fit = request.getBoolean("fit", true);
 
 		IMediaFile mediaFile = fileManager.getMediaFile(id);
 
-		byte[] image = loader.getImage(new LoaderContext(mediaFile, width, height).setFit(fit).setFrameSeconds(seconds));
+		ImageData image = loader.getImage(new LoaderContext(mediaFile, width, height).setFit(fit).setFrameSeconds(seconds).setFrameDuration(duration));
 
-		response.addHeader("Cache-Control", "public, max-age=604800");
-		response.ok(MimeType.IMAGE_JPEG, ByteSource.wrap(image));
+		// response.addHeader("Cache-Control", "public, max-age=604800");
+		String type = MimeType.forExtension(image.getFormat().name());
+		response.ok(type, ByteSource.wrap(image.getImage()));
 	}
 
 }

@@ -1,9 +1,8 @@
 package com.robindrew.mediamanager.component.file.loader.frame;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.util.concurrent.TimeUnit;
 
 import org.jcodec.api.FrameGrab;
@@ -23,21 +22,10 @@ public class AnimatedGifWriter {
 
 	private static final Logger log = LoggerFactory.getLogger(AnimatedGifWriter.class);
 
-	private final File outputFile;
 	private int maxWidth = 640;
 	private int maxHeight = 480;
-
-	public AnimatedGifWriter(File outputFile) {
-		this.outputFile = outputFile;
-	}
-
-	public AnimatedGifWriter(String outputFile) {
-		this.outputFile = new File(outputFile);
-	}
-
-	public File getOutputFile() {
-		return outputFile;
-	}
+	private int repeatIterations = 0;
+	private int quality = 20;
 
 	public int getMaxWidth() {
 		return maxWidth;
@@ -55,25 +43,41 @@ public class AnimatedGifWriter {
 		this.maxHeight = maxHeight;
 	}
 
+	public int getRepeatIterations() {
+		return repeatIterations;
+	}
+
+	public void setRepeatIterations(int repeatIterations) {
+		this.repeatIterations = repeatIterations;
+	}
+
+	public int getQuality() {
+		return quality;
+	}
+
+	public void setQuality(int quality) {
+		this.quality = quality;
+	}
+
 	private BufferedImage toBufferedImage(Picture picture) {
 		BufferedImage image = AWTUtil.toBufferedImage(picture);
 		image = Images.scaleImageToFit(image, maxWidth, maxHeight);
 		return image;
 	}
 
-	public void writeFrames(String inputFile, double seconds) {
-		writeFrames(new File(inputFile), seconds);
+	public byte[] writeFrames(String inputFile, double seconds) {
+		return writeFrames(new File(inputFile), seconds);
 	}
 
-	public void writeFrames(File inputFile, double seconds) {
-		writeFrames(inputFile, 0.0, seconds);
+	public byte[] writeFrames(File inputFile, double seconds) {
+		return writeFrames(inputFile, 0.0, seconds);
 	}
 
-	public void writeFrames(String inputFile, double fromSecond, double toSecond) {
-		writeFrames(new File(inputFile), fromSecond, toSecond);
+	public byte[] writeFrames(String inputFile, double fromSecond, double toSecond) {
+		return writeFrames(new File(inputFile), fromSecond, toSecond);
 	}
 
-	public void writeFrames(File inputFile, double fromSecond, double toSecond) {
+	public byte[] writeFrames(File inputFile, double fromSecond, double toSecond) {
 		if (fromSecond < 0.0) {
 			throw new IllegalArgumentException("fromSecond=" + fromSecond);
 		}
@@ -82,36 +86,38 @@ public class AnimatedGifWriter {
 		}
 
 		// We are limited to 10 frames a second max, code doesn't work properly otherwise
-		log.info("[Writing] {} ({} s -> {} s)", outputFile, fromSecond, toSecond);
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		log.info("[Writing] {} ({} s -> {} s)", inputFile.getName(), fromSecond, toSecond);
 		Stopwatch timer = Stopwatch.createStarted();
 		int frameCount = 0;
 		try (FileChannelWrapper channel = NIOUtils.readableChannel(inputFile)) {
 			FrameGrab frames = FrameGrab.createFrameGrab(channel);
 
 			AnimatedGifEncoder encoder = new AnimatedGifEncoder();
-			try (BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(outputFile))) {
-				encoder.start(output);
-				encoder.setDelay(100); // 10 frames a second
+			encoder.start(output);
+			encoder.setDelay(100); // 10 frames a second
+			encoder.setRepeat(repeatIterations);
+			encoder.setQuality(quality);
 
-				long minSecond = 0;
-				double second = fromSecond;
-				while (second < toSecond) {
-					Picture frame = frames.seekToSecondPrecise(second).getNativeFrame();
-					encoder.addFrame(toBufferedImage(frame));
-					frameCount++;
-					second = fromSecond + (frameCount * 0.1); // 10 frames a second
-					long elapsed = timer.elapsed(TimeUnit.SECONDS);
-					if (minSecond < elapsed && elapsed % 5 == 0) {
-						minSecond = elapsed;
-						log.info("[Writing] {} ({} frames in {})", outputFile, frameCount, timer);
-					}
+			long minSecond = 0;
+			double second = fromSecond;
+			while (second < toSecond) {
+				Picture frame = frames.seekToSecondPrecise(second).getNativeFrame();
+				encoder.addFrame(toBufferedImage(frame));
+				frameCount++;
+				second = fromSecond + (frameCount * 0.1); // 10 frames a second
+				long elapsed = timer.elapsed(TimeUnit.SECONDS);
+				if (minSecond < elapsed && elapsed % 5 == 0) {
+					minSecond = elapsed;
+					log.info("[Writing] {} ({} frames in {})", inputFile.getName(), frameCount, timer);
 				}
-				encoder.finish();
 			}
+			encoder.finish();
 		} catch (Exception e) {
 			throw Java.propagate(e);
 		}
 		timer.stop();
-		log.info("[Written] {} ({} frames in {})", outputFile, frameCount, timer);
+		log.info("[Written] {} ({} frames in {})", inputFile.getName(), frameCount, timer);
+		return output.toByteArray();
 	}
 }
