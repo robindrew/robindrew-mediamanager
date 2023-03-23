@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.jcodec.api.FrameGrab;
 import org.jcodec.common.io.FileChannelWrapper;
 import org.jcodec.common.io.NIOUtils;
@@ -22,10 +24,17 @@ public class AnimatedGifWriter {
 
 	private static final Logger log = LoggerFactory.getLogger(AnimatedGifWriter.class);
 
+	private final File inputFile;
 	private int maxWidth = 640;
 	private int maxHeight = 480;
 	private int repeatIterations = 0;
 	private int quality = 20;
+	private double fromSecond = 0.0;
+	private double toSecond = 5.0;
+
+	public AnimatedGifWriter(File inputFile) {
+		this.inputFile = inputFile;
+	}
 
 	public int getMaxWidth() {
 		return maxWidth;
@@ -33,6 +42,26 @@ public class AnimatedGifWriter {
 
 	public int getMaxHeight() {
 		return maxHeight;
+	}
+
+	public int getRepeatIterations() {
+		return repeatIterations;
+	}
+
+	public int getQuality() {
+		return quality;
+	}
+
+	public double getFromSecond() {
+		return fromSecond;
+	}
+
+	public double getToSecond() {
+		return toSecond;
+	}
+
+	public File getInputFile() {
+		return inputFile;
 	}
 
 	public void setMaxWidth(int maxWidth) {
@@ -43,20 +72,20 @@ public class AnimatedGifWriter {
 		this.maxHeight = maxHeight;
 	}
 
-	public int getRepeatIterations() {
-		return repeatIterations;
-	}
-
 	public void setRepeatIterations(int repeatIterations) {
 		this.repeatIterations = repeatIterations;
 	}
 
-	public int getQuality() {
-		return quality;
-	}
-
 	public void setQuality(int quality) {
 		this.quality = quality;
+	}
+
+	public void setFromSecond(double fromSecond) {
+		this.fromSecond = fromSecond;
+	}
+
+	public void setToSecond(double toSecond) {
+		this.toSecond = toSecond;
 	}
 
 	private BufferedImage toBufferedImage(Picture picture) {
@@ -65,19 +94,17 @@ public class AnimatedGifWriter {
 		return image;
 	}
 
-	public byte[] writeFrames(String inputFile, double seconds) {
-		return writeFrames(new File(inputFile), seconds);
+	@Override
+	public int hashCode() {
+		return HashCodeBuilder.reflectionHashCode(this);
 	}
 
-	public byte[] writeFrames(File inputFile, double seconds) {
-		return writeFrames(inputFile, 0.0, seconds);
+	@Override
+	public boolean equals(Object that) {
+		return EqualsBuilder.reflectionEquals(this, that);
 	}
 
-	public byte[] writeFrames(String inputFile, double fromSecond, double toSecond) {
-		return writeFrames(new File(inputFile), fromSecond, toSecond);
-	}
-
-	public byte[] writeFrames(File inputFile, double fromSecond, double toSecond) {
+	public byte[] writeFrames() {
 		if (fromSecond < 0.0) {
 			throw new IllegalArgumentException("fromSecond=" + fromSecond);
 		}

@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -40,6 +41,7 @@ import com.robindrew.common.io.file.Files;
 import com.robindrew.mediamanager.component.file.cache.IMediaFile;
 import com.robindrew.mediamanager.component.file.cache.MediaType;
 import com.robindrew.mediamanager.component.file.loader.frame.AnimatedGifWriter;
+import com.robindrew.mediamanager.component.file.loader.frame.AnimatedGifWriterQueue;
 import com.robindrew.mediamanager.component.file.loader.frame.MediaFrame;
 import com.robindrew.mediamanager.component.file.manager.IMediaFileManager;
 
@@ -87,8 +89,10 @@ public class MediaFileLoader implements IMediaFileLoader {
 	private final IMediaFileManager manager;
 	private final Map<ImageKey, Reference<ImageData>> imageCache = new ConcurrentHashMap<>();
 	private final File cacheDirectory;
+	private final AnimatedGifWriterQueue writerQueue;
 
-	public MediaFileLoader(@Autowired IMediaFileManager manager, @Value("${cache.file.directory}") File cacheDirectory) {
+	public MediaFileLoader(@Autowired IMediaFileManager manager, @Value("${cache.file.directory}") File cacheDirectory, @Autowired AnimatedGifWriterQueue writerQueue) {
+		this.writerQueue = writerQueue;
 		this.manager = Preconditions.notNull("manager", manager);
 		this.cacheDirectory = Preconditions.existsDirectory("cacheDirectory", cacheDirectory);
 	}
@@ -163,10 +167,14 @@ public class MediaFileLoader implements IMediaFileLoader {
 					image = new MediaFrame(file, context.getFrameSeconds()).toBufferedImage();
 				} else {
 					try {
-						AnimatedGifWriter writer = new AnimatedGifWriter();
 						double fromSecond = context.getFrameSeconds().doubleValue();
 						double toSecond = fromSecond + context.getFrameDuration().doubleValue();
-						byte[] imageData = writer.writeFrames(file, fromSecond, toSecond);
+						AnimatedGifWriter writer = new AnimatedGifWriter(file);
+						writer.setFromSecond(fromSecond);
+						writer.setToSecond(toSecond);
+						
+						Future<byte[]> future = writerQueue.enqueue(writer);
+						byte[] imageData = future.get();
 						return new ImageData(imageData, ImageFormat.GIF);
 					} catch (Exception e) {
 						log.warn("Failed to write animated GIF for file " + file, e);
